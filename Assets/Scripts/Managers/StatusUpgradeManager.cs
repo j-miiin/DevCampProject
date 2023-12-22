@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
-public enum StatusType { ATK, HP, DEF, CRIT_CH, CRIT_DMG }
+public enum StatusType { ATK, HP, DEF, CRIT_CH, CRIT_DMG, ATK_SPD }
 
 [Serializable]
 struct UpgradeData
@@ -129,6 +129,7 @@ public class StatusUpgradeManager : MonoBehaviour
     public static event Action<StatusType,int> OnDefenseUpgrade;
     public static event Action<StatusType,float> OnCritChanceUpgrade;
     public static event Action<StatusType,float> OnCritDamageUpgrade;
+    public static event Action<StatusType, int> OnAtkSpeedUpgrade;
 
     public static StatusUpgradeManager instance;
 
@@ -169,6 +170,13 @@ public class StatusUpgradeManager : MonoBehaviour
     [SerializeField] int critDamageFirstPrice = 150;
     [SerializeField] int critDamagepricePercent = 15;
 
+    [Header("[공격 속도]")]
+    [Header("[초기 값, 증가량, 초기 비용, 증가율]")]
+    [SerializeField] int atkSpeedFirstValue = 20;
+    [SerializeField] int atkSpeedIncrease = 5;
+    [SerializeField] int atkSpeedFirstPrice = 150;
+    [SerializeField] int atkSpeedPricePercent = 10;
+
 
 
     [Header("업그레이드 UI")]
@@ -202,6 +210,11 @@ public class StatusUpgradeManager : MonoBehaviour
     [SerializeField] TMP_Text critDamageUpgradePriceText;
     [SerializeField] Button critDamageUpgradeBtn;
 
+    [Header("[공격 속도]")]
+    [SerializeField] TMP_Text atkSpeedUpgradeLevelText;
+    [SerializeField] TMP_Text atkSpeedUpgradeValueText;
+    [SerializeField] TMP_Text atkSpeedUpgradePriceText;
+    [SerializeField] Button atkSpeedUpgradeBtn;
 
 
     UpgradeData attackUpgradeData;
@@ -209,6 +222,7 @@ public class StatusUpgradeManager : MonoBehaviour
     UpgradeData defenseUpgradeData;
     UpgradeData critChanceUpgradeData;
     UpgradeData critDamageUpgradeData;
+    UpgradeData atkSpeedUpgradeData;
 
     private void Awake()
     {
@@ -231,6 +245,7 @@ public class StatusUpgradeManager : MonoBehaviour
         defenseUpgradeBtn.onClick.AddListener(UpgradeDefense);
         critChanceUpgradeBtn.onClick.AddListener(UpgradeCritChance);
         critDamageUpgradeBtn.onClick.AddListener(UpgradeCritDamage);
+        atkSpeedUpgradeBtn.onClick.AddListener(UpgradeAtkSpeed);
     }
 
     // UpdateData 초기화 메서드 - 여기서 스텟퍼센트 조정 가능
@@ -299,6 +314,19 @@ public class StatusUpgradeManager : MonoBehaviour
             upgradePriceText: critDamageUpgradePriceText,
             upgradeBtn: critDamageUpgradeBtn
             );
+        atkSpeedUpgradeData = new UpgradeData(
+            StatusType.ATK_SPD,
+            ES3.Load<int>($"{StatusType.ATK_SPD}UpgradeLevel", 0),
+            atkSpeedFirstPrice,
+            atkSpeedPricePercent,
+            increase: atkSpeedIncrease,
+            upgradeValue: atkSpeedFirstValue,
+            OnStatusUpgrade: OnAtkSpeedUpgrade,
+            upgradeLevelText: atkSpeedUpgradeLevelText,
+            upgradeValueText: atkSpeedUpgradeValueText,
+            upgradePriceText: atkSpeedUpgradePriceText,
+            upgradeBtn: atkSpeedUpgradeBtn
+            );
     }
 
 
@@ -323,6 +351,9 @@ public class StatusUpgradeManager : MonoBehaviour
                 break;
             case StatusType.CRIT_DMG:
                 critDamageUpgradeData.SetUpgradeUI();
+                break;
+            case StatusType.ATK_SPD:
+                atkSpeedUpgradeData.SetUpgradeUI();
                 break;
         }
     }
@@ -379,5 +410,38 @@ public class StatusUpgradeManager : MonoBehaviour
 
         critDamageUpgradeData.CritStatusUpdate();
         SetUpgradeUI(critDamageUpgradeData);
+    }
+
+    public void UpgradeAtkSpeed()
+    {
+        if (!CurrencyManager.instance.SubtractCurrency("Gold", healthUpgradeData.upgradePrice)) return;
+
+        atkSpeedUpgradeData.StatusUpdate();
+        SetUpgradeUI(atkSpeedUpgradeData);
+    }
+
+    public void UpgradeStat(StatusType type)
+    {
+        switch (type)
+        {
+            case StatusType.ATK:
+                UpgradeAttack();
+                break;
+            case StatusType.HP:
+                UpgradeHealth();
+                break;
+            case StatusType.DEF:
+                UpgradeDefense();
+                break;
+            case StatusType.CRIT_CH:
+                UpgradeCritChance();
+                break;
+            case StatusType.CRIT_DMG:
+                UpgradeCritDamage();
+                break;
+            case StatusType.ATK_SPD:
+                UpgradeAtkSpeed();
+                break;
+        }
     }
 }
