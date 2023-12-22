@@ -119,6 +119,20 @@ public class Player : MonoBehaviour
                 equiped_Weapon.SaveEquipment();
                 Debug.Log("장비 장착" + equiped_Weapon.name);
                 break;
+            case EquipmentType.Armor:
+
+                UnEquip(equipment.type);
+
+                equiped_Weapon = equipment.GetComponent<WeaponInfo>();
+
+                equiped_Weapon.OnEquipped = true;
+
+                status.IncreaseBaseStatByPercent(StatusType.DEF, equiped_Weapon.equippedEffect);
+
+                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
+                equiped_Weapon.SaveEquipment();
+                Debug.Log("장비 장착" + equiped_Weapon.name);
+                break;
         }
     }
 
@@ -133,6 +147,15 @@ public class Player : MonoBehaviour
                 equiped_Weapon.OnEquipped = false;
                 EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
                 status.DecreaseBaseStatByPercent(StatusType.ATK, equiped_Weapon.equippedEffect);
+                equiped_Weapon.SaveEquipment();
+                Debug.Log("장비 장착 해제" + equiped_Weapon.name);
+                equiped_Weapon = null;
+                break;
+            case EquipmentType.Armor:
+                if (equiped_Weapon == null) return;
+                equiped_Weapon.OnEquipped = false;
+                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
+                status.DecreaseBaseStatByPercent(StatusType.DEF, equiped_Weapon.equippedEffect);
                 equiped_Weapon.SaveEquipment();
                 Debug.Log("장비 장착 해제" + equiped_Weapon.name);
                 equiped_Weapon = null;

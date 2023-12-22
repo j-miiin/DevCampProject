@@ -9,6 +9,7 @@ public class EquipmentManager : MonoBehaviour
     public static EquipmentManager instance;
 
     [SerializeField] List<WeaponInfo> weapons = new List<WeaponInfo>();
+    [SerializeField] List<WeaponInfo> armors = new List<WeaponInfo>();
 
     [SerializeField]
     private static Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
@@ -80,6 +81,7 @@ public class EquipmentManager : MonoBehaviour
     void CreateAllWeapon()
     {
         int weaponCount = 0;
+        int armorCount = 0;
         int rarityIntValue = 0;
 
         foreach (Rarity rarity in rarities)
@@ -107,6 +109,8 @@ public class EquipmentManager : MonoBehaviour
                 weapon.SaveEquipment(name);
 
                 weaponCount++;
+
+                
             }
         }
     }

@@ -9,6 +9,7 @@ public class LongClickUpgrader : MonoBehaviour, IPointerDownHandler, IPointerUpH
     private bool isClicked;
     private bool isStartUpgrade;
     private float clickTime;
+    private Coroutine curCoroutine;
 
     private void Update()
     {
@@ -17,7 +18,7 @@ public class LongClickUpgrader : MonoBehaviour, IPointerDownHandler, IPointerUpH
             clickTime += Time.deltaTime;
             if (clickTime > 2f && !isStartUpgrade)
             {
-                StartCoroutine(COUpgradeStat());
+                curCoroutine = StartCoroutine(COUpgradeStat());
                 isStartUpgrade = true;
             }
         }
@@ -33,7 +34,8 @@ public class LongClickUpgrader : MonoBehaviour, IPointerDownHandler, IPointerUpH
         isClicked = false;
         isStartUpgrade = false;
         clickTime = 0;
-        StopAllCoroutines();
+        StopCoroutine(curCoroutine);
+        curCoroutine = null;
     }
 
     private IEnumerator COUpgradeStat()
@@ -45,5 +47,4 @@ public class LongClickUpgrader : MonoBehaviour, IPointerDownHandler, IPointerUpH
             yield return interval;
         }
     }
-
 }
