@@ -79,27 +79,37 @@ public class EquipmentUI : MonoBehaviour
     // 장비 클릭 했을 때 불리는 메서드
     public void SelectEquipment(Equipment equipment)
     {
+        selectEquipment = equipment;
         switch (selectEquipment.type)
         {
             case EquipmentType.Weapon:
                 selectEquipment.GetComponent<WeaponInfo>().SetWeaponInfo(equipment.GetComponent<WeaponInfo>());
                 UpdateSelectedEquipmentUI(selectEquipment);
                 break;
+            case EquipmentType.Armor:
+                selectEquipment.GetComponent<ArmorInfo>().SetArmorInfo(equipment.GetComponent<ArmorInfo>());
+                UpdateSelectedEquipmentUI(selectEquipment);
+                break;
         }
     }
-
     
     private void UpdateSelectedEquipmentUI(Equipment equipment)
     {
         equipment.SetQuantityUI();
 
-        selectEquipment.GetComponent<WeaponInfo>().SetUI();
+        switch (selectEquipment.type)
+        {
+            case EquipmentType.Weapon:
+                selectEquipment.GetComponent<WeaponInfo>().SetUI();
+                break;
+            case EquipmentType.Armor:
+                selectEquipment.GetComponent<ArmorInfo>().SetUI();
+                break;
+        }
+
         SetOnEquippedBtnUI(selectEquipment.OnEquipped);
-
         SetselectEquipmentTextUI(equipment);
-
     }
-
 
     // 선택 장비 데이터 UI로 보여주는 메서드
     void SetselectEquipmentTextUI(Equipment equipment)
@@ -119,8 +129,8 @@ public class EquipmentUI : MonoBehaviour
         }
         else
         {
-        equipBtn.gameObject.SetActive(true);
-        unEquipBtn.gameObject.SetActive(false);
+            equipBtn.gameObject.SetActive(true);
+            unEquipBtn.gameObject.SetActive(false);
         }
     }
 
@@ -144,6 +154,24 @@ public class EquipmentUI : MonoBehaviour
                 RequiredCurrencyText.text = enhanceEquipmentTemp.GetEnhanceStone().ToString();
 
                 enhanceEquipment.GetComponent<WeaponInfo>().SetWeaponInfo(enhanceEquipmentTemp.GetComponent<WeaponInfo>());
+
+                enhanceEquipment.SetUI();
+                break;
+            case EquipmentType.Armor:
+                Equipment tmpEquipment = EquipmentManager.GetEquipment(selectEquipment.name);
+
+                Debug.Log("가보자" + tmpEquipment.GetComponent<ArmorInfo>().myColor);
+
+                enhanceLevelText.text = $"장비 강화 ({tmpEquipment.enhancementLevel} / {tmpEquipment.enhancementMaxLevel}</color>)"; //장비 강화(0 / 0)
+                EquippedPreview.text = $"장착 효과 {tmpEquipment.equippedEffect} → <color=green>{tmpEquipment.equippedEffect + tmpEquipment.basicEquippedEffect}</color>"; // 장착 효과 0 → 0
+                OwnedPreview.text = $"보유 효과 {tmpEquipment.ownedEffect} → <color=green>{tmpEquipment.ownedEffect + tmpEquipment.basicOwnedEffect}</color>";
+
+                EnhanceCurrencyText.text = CurrencyManager.instance.GetCurrencyAmount("EnhanceStone");
+
+                Debug.Log("얼마냐 : " + tmpEquipment.GetEnhanceStone());
+                RequiredCurrencyText.text = tmpEquipment.GetEnhanceStone().ToString();
+
+                enhanceEquipment.GetComponent<ArmorInfo>().SetArmorInfo(tmpEquipment.GetComponent<ArmorInfo>());
 
                 enhanceEquipment.SetUI();
                 break;
@@ -183,14 +211,12 @@ public class EquipmentUI : MonoBehaviour
     {
         Debug.Log("장착 됨 ");
         Player.OnEquip?.Invoke(EquipmentManager.GetEquipment(selectEquipment.name));
-        
     }
 
     // 장착 해제 버튼 눌렀을 때 불리는 메서드
     public void OnClickUnEquip()
     {
         Player.OnUnEquip?.Invoke(selectEquipment.type);
-        
     }
 
     // 선택한 장비 데이터 업데이트 (저장한다고 생각하면 편함)

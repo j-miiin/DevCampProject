@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +8,7 @@ public class EquipmentManager : MonoBehaviour
     public static EquipmentManager instance;
 
     [SerializeField] List<WeaponInfo> weapons = new List<WeaponInfo>();
-    [SerializeField] List<WeaponInfo> armors = new List<WeaponInfo>();
+    [SerializeField] List<ArmorInfo> armors = new List<ArmorInfo>();
 
     [SerializeField]
     private static Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
@@ -48,6 +47,7 @@ public class EquipmentManager : MonoBehaviour
     public void LoadAllWeapon()
     {
         int weaponCount = 0;
+        int armorCount = 0;
         int rarityIntValue = 0;
 
         foreach (Rarity rarity in rarities)
@@ -62,9 +62,7 @@ public class EquipmentManager : MonoBehaviour
 
                 weapon.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(weapon));
 
-
                 AddEquipment(name, weapon);
-
 
                 if (weapon.OnEquipped) Player.OnEquip(weapon);
 
@@ -73,6 +71,23 @@ public class EquipmentManager : MonoBehaviour
                 // 임시
                 weapon.myColor = colors[rarityIntValue];
                 weapon.SetUI();
+
+                // Armor
+                string armorName = $"{rarity}_Armor_{level}";
+                ArmorInfo armor = armors[armorCount];
+
+                armor.LoadEquipment(armorName);
+
+                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
+
+                AddEquipment(armorName, armor);
+
+                if (armor.OnEquipped) Player.OnEquip(armor);
+
+                armorCount++;
+
+                armor.myColor = colors[rarityIntValue];
+                armor.SetUI();
             }
         }
     }
@@ -110,7 +125,25 @@ public class EquipmentManager : MonoBehaviour
 
                 weaponCount++;
 
-                
+                // Armor
+                ArmorInfo armor = armors[armorCount];
+                string armorName = $"{rarity}_Armor_{level}";// Weapon Lv
+
+                int armorEquippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
+                int armorOwnedEffect = (int)(armorEquippedEffect * 0.4f);
+                string armorEquippedEffectText = $"{armorEquippedEffect}%";
+                string armorOwnedEffectText = $"{armorOwnedEffect}%";
+
+                armor.SetArmorInfo(armorName, 1, level, false, EquipmentType.Armor, rarity,
+                                 1, armorEquippedEffect, armorOwnedEffect, colors[rarityIntValue]);
+
+                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
+
+                AddEquipment(armorName, armor);
+
+                armor.SaveEquipment(armorName);
+
+                armorCount++;
             }
         }
     }

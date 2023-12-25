@@ -29,7 +29,8 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     WeaponInfo equiped_Weapon = null;
-
+    [SerializeField]
+    ArmorInfo equiped_Armor = null;
 
     private void Awake()
     {
@@ -123,15 +124,15 @@ public class Player : MonoBehaviour
 
                 UnEquip(equipment.type);
 
-                equiped_Weapon = equipment.GetComponent<WeaponInfo>();
+                equiped_Armor = equipment.GetComponent<ArmorInfo>();
 
-                equiped_Weapon.OnEquipped = true;
+                equiped_Armor.OnEquipped = true;
 
-                status.IncreaseBaseStatByPercent(StatusType.DEF, equiped_Weapon.equippedEffect);
+                status.IncreaseBaseStatByPercent(StatusType.DEF, equiped_Armor.equippedEffect);
 
-                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
-                equiped_Weapon.SaveEquipment();
-                Debug.Log("장비 장착" + equiped_Weapon.name);
+                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Armor.OnEquipped);
+                equiped_Armor.SaveEquipment();
+                Debug.Log("장비 장착" + equiped_Armor.name);
                 break;
         }
     }
@@ -152,13 +153,13 @@ public class Player : MonoBehaviour
                 equiped_Weapon = null;
                 break;
             case EquipmentType.Armor:
-                if (equiped_Weapon == null) return;
-                equiped_Weapon.OnEquipped = false;
-                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
-                status.DecreaseBaseStatByPercent(StatusType.DEF, equiped_Weapon.equippedEffect);
-                equiped_Weapon.SaveEquipment();
-                Debug.Log("장비 장착 해제" + equiped_Weapon.name);
-                equiped_Weapon = null;
+                if (equiped_Armor == null) return;
+                equiped_Armor.OnEquipped = false;
+                EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Armor.OnEquipped);
+                status.DecreaseBaseStatByPercent(StatusType.DEF, equiped_Armor.equippedEffect);
+                equiped_Armor.SaveEquipment();
+                Debug.Log("장비 장착 해제" + equiped_Armor.name);
+                equiped_Armor = null;
                 break;
         }
     }
