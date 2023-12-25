@@ -90,6 +90,5 @@ public class ArmorInfo : Equipment
     void SetLevelText()
     {
         armorLevelText.text = level.ToString();
-        
     }
 }

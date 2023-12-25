@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Keiwando.BigInteger;
+using UnityEngine;
 
 // 장비 타입
 public enum EquipmentType
@@ -25,8 +23,6 @@ public enum Rarity
     None
     // 기타 희귀도...
 }
-
-
 
 public class Equipment : MonoBehaviour
 {
@@ -151,8 +147,8 @@ public class Equipment : MonoBehaviour
 
         equippedEffect = new BigInteger(ES3.Load<string>("equippedEffect_" + name));
         ownedEffect = new BigInteger(ES3.Load<string>("ownedEffect_" + name));
-
     }
+
     public void LoadEquipment(string equipmentID)
     {
         if (!ES3.KeyExists("name_" + equipmentID)) return;
@@ -171,6 +167,5 @@ public class Equipment : MonoBehaviour
 
         equippedEffect = new BigInteger(ES3.Load<string>("equippedEffect_" + equipmentID));
         ownedEffect = new BigInteger(ES3.Load<string>("ownedEffect_" + equipmentID));
-
     }
 }

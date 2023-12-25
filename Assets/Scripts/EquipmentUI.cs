@@ -176,7 +176,6 @@ public class EquipmentUI : MonoBehaviour
                 enhanceEquipment.SetUI();
                 break;
         }
-
     }
 
     // 합성 버튼 눌렸을 때 불리는 메서드
