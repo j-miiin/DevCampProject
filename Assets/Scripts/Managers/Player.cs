@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Keiwando.BigInteger;
 using System;
+using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -14,14 +12,21 @@ public class Player : MonoBehaviour
     [SerializeField]
     PlayerStatus status;
 
+    [SerializeField][Header("경험치 증가 계수")]
+    private int exp;
+    [SerializeField][Header("현재 경험치")]
+    private int currentExp;
+    [SerializeField][Header("현재 최대 경험치")]
+    private int maxExp;
+    [SerializeField][Header("현재 레벨")]
+    private int currentLevel;
 
-    [SerializeField]
-    [Header("총 공격력")]
-    private BigInteger currentAttack;
+    [SerializeField][Header("총 공격력")]
+    private BigInteger currentAttack = 0;
     [SerializeField][Header("총 체력")]
-    private BigInteger currentHealth;
+    private BigInteger currentHealth = 0;
     [SerializeField][Header("총 방어력")]
-    private BigInteger currentDefense;
+    private BigInteger currentDefense = 0;
     [SerializeField][Header("총 크리티컬 확률")]
     private BigInteger currentCritChance;
     [SerializeField][Header("총 크리티컬 데미지")]
@@ -35,7 +40,6 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         instance = this;
-
     }
 
     private void Start()
@@ -52,9 +56,28 @@ public class Player : MonoBehaviour
         StatusUpgradeManager.OnCritChanceUpgrade += status.IncreaseBaseStat;
         StatusUpgradeManager.OnCritDamageUpgrade += status.IncreaseBaseStat;
 
-
         OnEquip += Equip;
         OnUnEquip += UnEquip;
+    }
+
+    public void GetExp()
+    {
+        currentExp += exp;
+        if (currentExp >= maxExp) LevelUp();
+    }
+
+    public void LevelUp()
+    {
+        currentLevel++;
+        maxExp += maxExp / 5;
+        currentExp = 0;
+
+        currentAttack = currentAttack + 2;
+        currentHealth = currentHealth + 50;
+        currentDefense = currentDefense + 2;
+
+        Debug.Log($"레벨 업! 현재 레벨 : {currentLevel}\n현재 최대 경험치 : {maxExp}");
+        Debug.Log($"현재 공격력 : {currentAttack}\n현재 체력 : {currentHealth}\n현재 방어력 : {currentDefense}");
     }
 
     // 현재 능력치를 불러오는 메서드
