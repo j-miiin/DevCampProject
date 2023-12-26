@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class EquipmentManager : MonoBehaviour
     [SerializeField] Color[] colors;
 
     int maxLevel = 4;
+
+    private WeaponInfo recommendedWeapon;
+    private ArmorInfo recommendedArmor;
 
     private void Awake()
     {
@@ -152,19 +156,56 @@ public class EquipmentManager : MonoBehaviour
     public int Composite(Equipment equipment)
     {
         if (equipment.quantity < 4) return -1;
+        if (equipment.type == EquipmentType.Weapon
+            && equipment.name == weapons[weapons.Count - 1].name) return -1;
+        if (equipment.type == EquipmentType.Armor
+            && equipment.name == armors[armors.Count - 1].name) return -1;
 
         int compositeCount = equipment.quantity / 4;
-        equipment.quantity %= 4;
 
-        Equipment nextEquipment = GetNextEquipment(equipment.name);
+        equipment.quantity -= (compositeCount * 4);
+        equipment.SetQuantityUI();
+        equipment.SaveEquipment(equipment.name);
 
+        Equipment nextEquipment = GetNextEquipment(equipment.name, equipment.type);
         nextEquipment.quantity += compositeCount;
-
         nextEquipment.SetQuantityUI();
-
         nextEquipment.SaveEquipment(nextEquipment.name);
 
         return compositeCount;
+    }
+
+    public void AllComposite(EquipmentType type)
+    {
+        switch (type)
+        {
+            case EquipmentType.Weapon:
+                for (int i = 0; i < weapons.Count; i++) Composite(weapons[i]);
+                break;
+            case EquipmentType.Armor:
+                for (int i = 0; i < armors.Count; i++) Composite(armors[i]);
+                break;
+        }
+    }
+
+    public bool IsAllCompositable(EquipmentType type)
+    {
+        switch (type)
+        {
+            case EquipmentType.Weapon:
+                for (int i = 0; i < weapons.Count; i++)
+                {
+                    if (weapons[i].quantity >= 4 && i != weapons.Count - 1) return true;
+                }
+                return false;
+            case EquipmentType.Armor:
+                for (int i = 0; i < armors.Count; i++)
+                {
+                    if (armors[i].quantity >= 4 && i != armors.Count - 1) return true;
+                }
+                return false;
+        }
+        return false;
     }
 
     // AllEquipment에 Equipment 더하는 메서드
@@ -194,6 +235,20 @@ public class EquipmentManager : MonoBehaviour
         }
     }
 
+    public Equipment GetEquipment(EquipmentType type, int idx)
+    {
+        switch (type)
+        {
+            case EquipmentType.Weapon:
+                if (idx >= weapons.Count) return null;
+                return weapons[idx];
+            case EquipmentType.Armor:
+                if (idx >= armors.Count) return null;
+                return armors[idx];
+        }
+        return null;
+    }
+
     // AllEquipment에서 매개변수로 받은 key을 사용하는 Equipment 업데이트 하는 메서드
     public static void SetEquipment(string equipmentName, Equipment equipment)
     {
@@ -211,7 +266,7 @@ public class EquipmentManager : MonoBehaviour
     }
 
     // 매개변수로 받은 key값을 사용하는 장비의 다음레벨 장비를 불러오는 메서드
-    public Equipment GetNextEquipment(string currentKey)
+    public Equipment GetNextEquipment(string currentKey, EquipmentType type = EquipmentType.Weapon)
     {
         int currentRarityIndex = -1;
         int currentLevel = -1;
@@ -223,7 +278,8 @@ public class EquipmentManager : MonoBehaviour
             if (currentKey.StartsWith(rarity.ToString()))
             {
                 currentRarityIndex = Array.IndexOf(rarities, rarity);
-                int.TryParse(currentKey.Replace(rarity + "_", ""), out currentLevel);
+                if (type == EquipmentType.Weapon) int.TryParse(currentKey.Replace(rarity + "_", ""), out currentLevel);
+                else if (type == EquipmentType.Armor) int.TryParse(currentKey.Replace(rarity + "_Armor_", ""), out currentLevel);
                 break;
             }
         }
@@ -233,13 +289,19 @@ public class EquipmentManager : MonoBehaviour
             if (currentLevel < maxLevel)
             {
                 // 같은 희귀도 내에서 다음 레벨 찾기
-                string nextKey = rarities[currentRarityIndex] + "_" + (currentLevel + 1);
+                string nextKey =
+                    (type == EquipmentType.Weapon)
+                    ? rarities[currentRarityIndex] + "_" + (currentLevel + 1)
+                    : rarities[currentRarityIndex] + "_Armor_" + (currentLevel + 1);
                 return allEquipment.TryGetValue(nextKey, out Equipment nextEquipment) ? nextEquipment : null;
             }
             else if (currentRarityIndex < rarities.Length - 1)
             {
                 // 희귀도를 증가시키고 첫 번째 레벨의 장비 찾기
-                string nextKey = rarities[currentRarityIndex + 1] + "_1";
+                string nextKey =
+                    (type == EquipmentType.Weapon)
+                    ? rarities[currentRarityIndex + 1] + "_1"
+                    : rarities[currentRarityIndex + 1] + "_Armor_1";
                 return allEquipment.TryGetValue(nextKey, out Equipment nextEquipment) ? nextEquipment : null;
             }
         }
@@ -285,4 +347,44 @@ public class EquipmentManager : MonoBehaviour
         return null;
     }
 
+    public WeaponInfo GetRecommendedWeapon()
+    {
+        if (recommendedWeapon == null) recommendedWeapon = weapons[0];
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            if (recommendedWeapon.equippedEffect < weapons[i].equippedEffect)
+                recommendedWeapon = weapons[i];
+        }
+        return recommendedWeapon;
+    }
+
+    public ArmorInfo GetRecommendedArmor()
+    {
+        if (recommendedArmor == null) recommendedArmor = armors[0];
+        for (int i = 0; i < armors.Count; i++)
+        {
+            if (recommendedArmor.equippedEffect < armors[i].equippedEffect)
+                recommendedArmor = armors[i];
+        }
+        return recommendedArmor;
+    }
+
+    public void TestGetRandomEquipment()
+    {
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            int rndNum = Random.Range(0, 4);
+            weapons[i].quantity += rndNum;
+            weapons[i].SetQuantityUI();
+            weapons[i].SaveEquipment(weapons[i].name);
+        }
+
+        for (int i = 0; i < armors.Count; i++)
+        {
+            int rndNum = Random.Range(0, 4);
+            armors[i].quantity += rndNum;
+            armors[i].SetQuantityUI();
+            armors[i].SaveEquipment(armors[i].name);
+        }
+    }
 }

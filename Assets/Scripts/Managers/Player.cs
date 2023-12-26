@@ -202,6 +202,16 @@ public class Player : MonoBehaviour
         }
     }
 
+    public WeaponInfo GetCurrentEquipedWeapon()
+    {
+        return equiped_Weapon;
+    }
+
+    public ArmorInfo GetCurrentEquipedArmor()
+    {
+        return equiped_Armor;
+    }
+
     // 플레이어 레벨 및 경험치 저장
     public void SaveLevelStatus()
     {

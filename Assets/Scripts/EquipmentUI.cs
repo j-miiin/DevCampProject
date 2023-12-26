@@ -3,6 +3,7 @@ using System;
 using TMPro;
 using UnityEngine.UI;
 using Keiwando.BigInteger;
+using System.Collections.Generic;
 
 public class EquipmentUI : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class EquipmentUI : MonoBehaviour
     public static Action<bool> UpdateEquipmentUI;
 
     public static EquipmentUI instance;
+
+    [SerializeField] TabViewController tabViewController;
 
     [SerializeField] Equipment[] selectableEquipments;
     [SerializeField] Equipment selectEquipment;
@@ -20,8 +23,10 @@ public class EquipmentUI : MonoBehaviour
 
     [SerializeField] Button equipBtn;
     [SerializeField] Button unEquipBtn;
+    [SerializeField] Button autoEquipBtn;
     [SerializeField] Button enhancePnaelBtn;
     [SerializeField] Button compositeBtn;
+    [SerializeField] Button allCompositeBtn;
 
     [Header("강화 패널")]
     [SerializeField] Equipment[] selectableEnhanceEquipments;
@@ -33,6 +38,7 @@ public class EquipmentUI : MonoBehaviour
     [SerializeField] TMP_Text EnhanceCurrencyText; // 현재 재화
     [SerializeField] TMP_Text RequiredCurrencyText; // 필요 재화
 
+    private EquipmentType curTabType;
 
     private void Awake()
     {
@@ -43,7 +49,6 @@ public class EquipmentUI : MonoBehaviour
     {
         //SetupEventListeners();
         InitializeButtonListeners();
-
     }
 
     // 이벤트 설정하는 메서드
@@ -51,12 +56,14 @@ public class EquipmentUI : MonoBehaviour
     {
         OnClickSelectEquipment += SelectEquipment;
         UpdateEquipmentUI += SetOnEquippedBtnUI;
+        tabViewController.OnTabChanged += CallOnTabChanged;
     }
 
     private void OnDisable()
     {
         OnClickSelectEquipment -= SelectEquipment;
         UpdateEquipmentUI -= SetOnEquippedBtnUI;
+        tabViewController.OnTabChanged -= CallOnTabChanged;
     }
 
     // 버튼 클릭 리스너 설정하는 메서드 
@@ -64,9 +71,11 @@ public class EquipmentUI : MonoBehaviour
     {
         equipBtn.onClick.AddListener(OnClickEquip);
         unEquipBtn.onClick.AddListener(OnClickUnEquip);
+        autoEquipBtn.onClick.AddListener(OnClickAutoEquip);
         enhancePnaelBtn.onClick.AddListener(OnClickEnhancePanel);
         enhanceBtn.onClick.AddListener(OnClickEnhance);
-        compositeBtn.onClick.AddListener(OnclickComposite);
+        compositeBtn.onClick.AddListener(OnClickComposite);
+        allCompositeBtn.onClick.AddListener(OnClickAllComposite);
     }
 
     // 장비 선택 이벤트 트리거 하는 메서드 
@@ -95,6 +104,8 @@ public class EquipmentUI : MonoBehaviour
                 UpdateSelectedEquipmentUI(selectEquipment);
                 break;
         }
+
+        compositeBtn.interactable = (equipment.quantity >= 4);
     }
     
     private void UpdateSelectedEquipmentUI(Equipment equipment)
@@ -189,13 +200,24 @@ public class EquipmentUI : MonoBehaviour
     }
 
     // 합성 버튼 눌렸을 때 불리는 메서드
-    public void OnclickComposite()
+    public void OnClickComposite()
     {
         EquipmentManager.instance.Composite(selectEquipment);
-
         selectEquipment.SetQuantityUI();
-
         UpdateSelectEquipmentData();
+
+        CheckAutoEquipActive();
+        CheckAllComposite();
+    }
+
+    // 전체 합성
+    public void OnClickAllComposite()
+    {
+        EquipmentManager.instance.AllComposite(curTabType);
+
+        TriggerSelectEquipment(selectEquipment);
+        CheckAutoEquipActive();
+        CheckAllComposite();
     }
 
     // 강화 버튼 눌렸을 때 불리는 메서드
@@ -207,12 +229,12 @@ public class EquipmentUI : MonoBehaviour
         selectEquipment.Enhance();
         SetselectEquipmentTextUI(selectEquipment);
 
-
         if (selectEquipment.OnEquipped) OnClickEquip();
 
         UpdateSelectEquipmentData();
 
         OnClickEnhancePanel();
+        CheckAutoEquipActive();
     }
 
     // 장착 버튼 눌렸을 때 불리는 메서드
@@ -220,6 +242,7 @@ public class EquipmentUI : MonoBehaviour
     {
         Debug.Log("장착 됨 ");
         Player.OnEquip?.Invoke(EquipmentManager.GetEquipment(selectEquipment.name));
+        CheckAutoEquipActive();
     }
 
     // 장착 해제 버튼 눌렀을 때 불리는 메서드
@@ -228,9 +251,56 @@ public class EquipmentUI : MonoBehaviour
         Player.OnUnEquip?.Invoke(selectEquipment.type);
     }
 
+    // 장비 자동 장착
+    public void OnClickAutoEquip()
+    {
+        Equipment recommendedEquipment = null;
+        switch (selectEquipment.type)
+        {
+            case EquipmentType.Weapon:
+                recommendedEquipment = EquipmentManager.instance.GetRecommendedWeapon();
+                Player.OnEquip?.Invoke(recommendedEquipment);
+                break;
+            case EquipmentType.Armor:
+                recommendedEquipment = EquipmentManager.instance.GetRecommendedArmor();
+                Player.OnEquip?.Invoke(recommendedEquipment);
+                break;
+        }
+        if (recommendedEquipment != null) TriggerSelectEquipment(recommendedEquipment);
+        autoEquipBtn.interactable = false;
+    }
+
     // 선택한 장비 데이터 업데이트 (저장한다고 생각하면 편함)
     public void UpdateSelectEquipmentData()
     {
         EquipmentManager.SetEquipment(selectEquipment.name, selectEquipment);
+    }
+
+    public void CheckAutoEquipActive()
+    {
+        switch (curTabType)
+        {
+            case EquipmentType.Weapon:
+                autoEquipBtn.interactable
+                    = Player.instance.GetCurrentEquipedWeapon() != EquipmentManager.instance.GetRecommendedWeapon();
+                break;
+            case EquipmentType.Armor:
+                autoEquipBtn.interactable
+                    = Player.instance.GetCurrentEquipedArmor() != EquipmentManager.instance.GetRecommendedArmor();
+                break;
+        }
+    }
+
+    public void CheckAllComposite()
+    {
+        allCompositeBtn.interactable = EquipmentManager.instance.IsAllCompositable(curTabType);
+    }
+
+    public void CallOnTabChanged(EquipmentType tabType)
+    {
+        curTabType = tabType;
+        TriggerSelectEquipment(EquipmentManager.instance.GetEquipment(curTabType, 0));
+        CheckAutoEquipActive();
+        CheckAllComposite();
     }
 }
