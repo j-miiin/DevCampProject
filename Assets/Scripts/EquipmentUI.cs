@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
@@ -13,6 +11,7 @@ public class EquipmentUI : MonoBehaviour
 
     public static EquipmentUI instance;
 
+    [SerializeField] Equipment[] selectableEquipments;
     [SerializeField] Equipment selectEquipment;
     [SerializeField] TMP_Text selectEquipmentName;
     [SerializeField] TMP_Text selectEquipment_equippedEffect;
@@ -142,7 +141,7 @@ public class EquipmentUI : MonoBehaviour
             case EquipmentType.Weapon:
                 Equipment enhanceEquipmentTemp = EquipmentManager.GetEquipment(selectEquipment.name);
 
-                Debug.Log("가보자" + enhanceEquipmentTemp.GetComponent<WeaponInfo>().myColor);
+                Debug.Log($"현재 강화 무기 : {enhanceEquipmentTemp.name}");
 
                 enhanceLevelText.text = $"장비 강화 ({enhanceEquipmentTemp.enhancementLevel} / {enhanceEquipmentTemp.enhancementMaxLevel}</color>)"; //장비 강화(0 / 0)
                 EquippedPreview.text = $"장착 효과 {enhanceEquipmentTemp.equippedEffect} → <color=green>{enhanceEquipmentTemp.equippedEffect + enhanceEquipmentTemp.basicEquippedEffect}</color>"; // 장착 효과 0 → 0
@@ -150,7 +149,7 @@ public class EquipmentUI : MonoBehaviour
 
                 EnhanceCurrencyText.text = CurrencyManager.instance.GetCurrencyAmount("EnhanceStone");
 
-                Debug.Log("얼마냐 : " + enhanceEquipmentTemp.GetEnhanceStone());
+                Debug.Log("필요 강화석 : " + enhanceEquipmentTemp.GetEnhanceStone());
                 RequiredCurrencyText.text = enhanceEquipmentTemp.GetEnhanceStone().ToString();
 
                 enhanceEquipment.GetComponent<WeaponInfo>().SetWeaponInfo(enhanceEquipmentTemp.GetComponent<WeaponInfo>());
@@ -160,7 +159,7 @@ public class EquipmentUI : MonoBehaviour
             case EquipmentType.Armor:
                 Equipment tmpEquipment = EquipmentManager.GetEquipment(selectEquipment.name);
 
-                Debug.Log("가보자" + tmpEquipment.GetComponent<ArmorInfo>().myColor);
+                Debug.Log($"현재 강화 방어구 : {tmpEquipment.name}");
 
                 enhanceLevelText.text = $"장비 강화 ({tmpEquipment.enhancementLevel} / {tmpEquipment.enhancementMaxLevel}</color>)"; //장비 강화(0 / 0)
                 EquippedPreview.text = $"장착 효과 {tmpEquipment.equippedEffect} → <color=green>{tmpEquipment.equippedEffect + tmpEquipment.basicEquippedEffect}</color>"; // 장착 효과 0 → 0
@@ -168,7 +167,7 @@ public class EquipmentUI : MonoBehaviour
 
                 EnhanceCurrencyText.text = CurrencyManager.instance.GetCurrencyAmount("EnhanceStone");
 
-                Debug.Log("얼마냐 : " + tmpEquipment.GetEnhanceStone());
+                Debug.Log("필요 강화석 : " + tmpEquipment.GetEnhanceStone());
                 RequiredCurrencyText.text = tmpEquipment.GetEnhanceStone().ToString();
 
                 enhanceEquipment.GetComponent<ArmorInfo>().SetArmorInfo(tmpEquipment.GetComponent<ArmorInfo>());

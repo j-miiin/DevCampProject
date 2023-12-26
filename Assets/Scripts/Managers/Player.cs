@@ -1,5 +1,6 @@
 using Keiwando.BigInteger;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -24,13 +25,15 @@ public class Player : MonoBehaviour
     [SerializeField][Header("총 공격력")]
     private BigInteger currentAttack = 0;
     [SerializeField][Header("총 체력")]
-    private BigInteger currentHealth = 0;
+    private BigInteger currentHealth = 100;
     [SerializeField][Header("총 방어력")]
     private BigInteger currentDefense = 0;
     [SerializeField][Header("총 크리티컬 확률")]
     private BigInteger currentCritChance;
     [SerializeField][Header("총 크리티컬 데미지")]
     private BigInteger currentCritDamage;
+    [SerializeField][Header("총 공격 속도")]
+    private BigInteger currentAtkSpeed;
 
     [SerializeField]
     WeaponInfo equiped_Weapon = null;
@@ -45,6 +48,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         SetupEventListeners();
+        LoadLevelStatus();
     }
 
     // 이벤트 설정하는 메서드
@@ -55,6 +59,7 @@ public class Player : MonoBehaviour
         StatusUpgradeManager.OnDefenseUpgrade += status.IncreaseBaseStat;
         StatusUpgradeManager.OnCritChanceUpgrade += status.IncreaseBaseStat;
         StatusUpgradeManager.OnCritDamageUpgrade += status.IncreaseBaseStat;
+        StatusUpgradeManager.OnAtkSpeedUpgrade += status.IncreaseBaseStat;
 
         OnEquip += Equip;
         OnUnEquip += UnEquip;
@@ -64,6 +69,8 @@ public class Player : MonoBehaviour
     {
         currentExp += exp;
         if (currentExp >= maxExp) LevelUp();
+
+        SaveLevelStatus();
     }
 
     public void LevelUp()
@@ -72,9 +79,11 @@ public class Player : MonoBehaviour
         maxExp += maxExp / 5;
         currentExp = 0;
 
-        currentAttack = currentAttack + 2;
-        currentHealth = currentHealth + 50;
-        currentDefense = currentDefense + 2;
+        status.IncreaseBaseStat(StatusType.ATK, 2);
+        status.IncreaseBaseStat(StatusType.HP, 50);
+        status.IncreaseBaseStat(StatusType.DEF, 2);
+
+        SaveLevelStatus();
 
         Debug.Log($"레벨 업! 현재 레벨 : {currentLevel}\n현재 최대 경험치 : {maxExp}");
         Debug.Log($"현재 공격력 : {currentAttack}\n현재 체력 : {currentHealth}\n현재 방어력 : {currentDefense}");
@@ -95,6 +104,8 @@ public class Player : MonoBehaviour
                 return currentCritChance;
             case StatusType.CRIT_DMG:
                 return currentCritDamage;
+            case StatusType.ATK_SPD:
+                return currentAtkSpeed;
         }
         return null;
     }
@@ -120,6 +131,9 @@ public class Player : MonoBehaviour
                 break;
             case StatusType.CRIT_DMG:
                 currentCritDamage = statusValue;
+                break;
+            case StatusType.ATK_SPD:
+                currentAtkSpeed = statusValue;
                 break;
         }
     }
@@ -186,5 +200,28 @@ public class Player : MonoBehaviour
                 equiped_Armor = null;
                 break;
         }
+    }
+
+    // 플레이어 레벨 및 경험치 저장
+    public void SaveLevelStatus()
+    {
+        ES3.Save<int>("level", currentLevel);
+        ES3.Save<int>("exp", currentExp);
+        ES3.Save<int>("maxExp", maxExp);
+    }
+
+    // 플레이어 레벨 및 경험치 정보 로드
+    public bool LoadLevelStatus()
+    {
+        if (ES3.KeyExists("level")) currentLevel = ES3.Load<int>("level");
+        else return false;
+
+        if (ES3.KeyExists("exp")) currentExp = ES3.Load<int>("exp");
+        else return false;
+
+        if (ES3.KeyExists("maxExp")) maxExp = ES3.Load<int>("maxExp");
+        else return false;
+
+        return true;
     }
 }

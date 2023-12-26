@@ -20,6 +20,10 @@ public class PlayerStatus : BaseStatus
     BigInteger currentDefenseValue = 0;
 
     [SerializeField]
+    BigInteger atkSpeedPercent = 0;
+    BigInteger currentAtkSpeedValue = 0;
+
+    [SerializeField]
     BigInteger critChancePercent = 0;
     BigInteger currentCritChanceValue = 0;
 
@@ -44,6 +48,9 @@ public class PlayerStatus : BaseStatus
                 break;
             case StatusType.CRIT_DMG:
                 Player.instance.SetCurrentStatus(statusType, IncreaseBaseStat(ref baseCritDamage, addValue, ref currentCritDamageValue, critDamagePercent));
+                break;
+            case StatusType.ATK_SPD:
+                Player.instance.SetCurrentStatus(statusType, IncreaseBaseStat(ref baseAtkSpeed, addValue, ref currentAtkSpeedValue, atkSpeedPercent));
                 break;
         }
         return;
@@ -77,6 +84,9 @@ public class PlayerStatus : BaseStatus
             case StatusType.CRIT_DMG:
                 Player.instance.SetCurrentStatus(statusType, DecreaseBaseStat(ref baseCritDamage, subtractValue, ref currentCritDamageValue, critDamagePercent));
                 break;
+            case StatusType.ATK_SPD:
+                Player.instance.SetCurrentStatus(statusType, DecreaseBaseStat(ref baseAtkSpeed, subtractValue, ref currentAtkSpeedValue, atkSpeedPercent));
+                break;
         }
         return;
     }
@@ -108,6 +118,9 @@ public class PlayerStatus : BaseStatus
             case StatusType.CRIT_DMG:
                 Player.instance.SetCurrentStatus(statusType, IncreaseBaseStatByPercent(ref critDamagePercent, addPercent, ref currentCritDamageValue, baseCritDamage));
                 break;
+            case StatusType.ATK_SPD:
+                Player.instance.SetCurrentStatus(statusType, IncreaseBaseStatByPercent(ref atkSpeedPercent, addPercent, ref currentAtkSpeedValue, baseAtkSpeed));
+                break;
         }
     }
 
@@ -127,6 +140,9 @@ public class PlayerStatus : BaseStatus
                 break;
             case StatusType.CRIT_DMG:
                 Player.instance.SetCurrentStatus(statusType, DecreaseBaseStatByPercent(ref critDamagePercent, subtractPercent, ref currentCritDamageValue, baseCritDamage));
+                break;
+            case StatusType.ATK_SPD:
+                Player.instance.SetCurrentStatus(statusType, DecreaseBaseStatByPercent(ref atkSpeedPercent, subtractPercent, ref currentAtkSpeedValue, baseAtkSpeed));
                 break;
         }
     }

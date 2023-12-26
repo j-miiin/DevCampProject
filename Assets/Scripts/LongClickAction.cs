@@ -33,8 +33,11 @@ public abstract class LongClickAction : MonoBehaviour, IPointerDownHandler, IPoi
         isClicked = false;
         isStartUpgrade = false;
         clickTime = 0;
-        StopCoroutine(curCoroutine);
-        curCoroutine = null;
+        if (curCoroutine != null)
+        {
+            StopCoroutine(curCoroutine);
+            curCoroutine = null;
+        }
     }
 
     private IEnumerator COUpgradeAction()
