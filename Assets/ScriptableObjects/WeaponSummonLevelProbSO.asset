@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98aa2a382d2334c9d9084047d3506d61, type: 3}
+  m_Name: WeaponSummonLevelProbSO
+  m_EditorClassIdentifier: 
+  summonLevelProbList:
+  - commonProb: 750
+    uncommonProb: 250
+    rareProb: 0
+    epicProb: 0
+    ancientProb: 0
+    legendaryProb: 0
+    mythologyProb: 0
+  - commonProb: 500
+    uncommonProb: 375
+    rareProb: 135
+    epicProb: 0
+    ancientProb: 0
+    legendaryProb: 0
+    mythologyProb: 0
+  - commonProb: 250
+    uncommonProb: 375
+    rareProb: 350
+    epicProb: 25
+    ancientProb: 0
+    legendaryProb: 0
+    mythologyProb: 0
+  - commonProb: 250
+    uncommonProb: 325
+    rareProb: 375
+    epicProb: 50
+    ancientProb: 0
+    legendaryProb: 0
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 125
+    rareProb: 250
+    epicProb: 350
+    ancientProb: 250
+    legendaryProb: 25
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 100
+    rareProb: 150
+    epicProb: 350
+    ancientProb: 350
+    legendaryProb: 50
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 100
+    rareProb: 100
+    epicProb: 350
+    ancientProb: 395
+    legendaryProb: 55
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 150
+    rareProb: 150
+    epicProb: 250
+    ancientProb: 385
+    legendaryProb: 65
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 0
+    rareProb: 200
+    epicProb: 350
+    ancientProb: 375
+    legendaryProb: 70
+    mythologyProb: 5
+  - commonProb: 0
+    uncommonProb: 0
+    rareProb: 180
+    epicProb: 350
+    ancientProb: 380
+    legendaryProb: 80
+    mythologyProb: 10
