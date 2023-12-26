@@ -23,8 +23,8 @@ public class EquipmentUI : MonoBehaviour
     [SerializeField] Button enhancePnaelBtn;
     [SerializeField] Button compositeBtn;
 
-
     [Header("강화 패널")]
+    [SerializeField] Equipment[] selectableEnhanceEquipments;
     [SerializeField] Equipment enhanceEquipment; // 강화 무기
     [SerializeField] Button enhanceBtn; // 강화 버튼
     [SerializeField] TMP_Text enhanceLevelText; // 강화 레벨 / 장비 강화 (0/0)
@@ -78,14 +78,19 @@ public class EquipmentUI : MonoBehaviour
     // 장비 클릭 했을 때 불리는 메서드
     public void SelectEquipment(Equipment equipment)
     {
-        selectEquipment = equipment;
-        switch (selectEquipment.type)
+        switch (equipment.type)
         {
             case EquipmentType.Weapon:
+                selectableEquipments[(int)EquipmentType.Weapon].gameObject.SetActive(true);
+                selectableEquipments[(int)EquipmentType.Armor].gameObject.SetActive(false);
+                selectEquipment = selectableEquipments[(int)EquipmentType.Weapon];
                 selectEquipment.GetComponent<WeaponInfo>().SetWeaponInfo(equipment.GetComponent<WeaponInfo>());
                 UpdateSelectedEquipmentUI(selectEquipment);
                 break;
             case EquipmentType.Armor:
+                selectableEquipments[(int)EquipmentType.Weapon].gameObject.SetActive(false);
+                selectableEquipments[(int)EquipmentType.Armor].gameObject.SetActive(true);
+                selectEquipment = selectableEquipments[(int)EquipmentType.Armor];
                 selectEquipment.GetComponent<ArmorInfo>().SetArmorInfo(equipment.GetComponent<ArmorInfo>());
                 UpdateSelectedEquipmentUI(selectEquipment);
                 break;
@@ -139,6 +144,9 @@ public class EquipmentUI : MonoBehaviour
         switch (selectEquipment.type)
         {
             case EquipmentType.Weapon:
+                selectableEnhanceEquipments[(int)EquipmentType.Weapon].gameObject.SetActive(true);
+                selectableEnhanceEquipments[(int)EquipmentType.Armor].gameObject.SetActive(false);
+                enhanceEquipment = selectableEnhanceEquipments[(int)EquipmentType.Weapon];
                 Equipment enhanceEquipmentTemp = EquipmentManager.GetEquipment(selectEquipment.name);
 
                 Debug.Log($"현재 강화 무기 : {enhanceEquipmentTemp.name}");
@@ -157,6 +165,9 @@ public class EquipmentUI : MonoBehaviour
                 enhanceEquipment.SetUI();
                 break;
             case EquipmentType.Armor:
+                selectableEnhanceEquipments[(int)EquipmentType.Weapon].gameObject.SetActive(false);
+                selectableEnhanceEquipments[(int)EquipmentType.Armor].gameObject.SetActive(true);
+                enhanceEquipment = selectableEnhanceEquipments[(int)EquipmentType.Armor];
                 Equipment tmpEquipment = EquipmentManager.GetEquipment(selectEquipment.name);
 
                 Debug.Log($"현재 강화 방어구 : {tmpEquipment.name}");
