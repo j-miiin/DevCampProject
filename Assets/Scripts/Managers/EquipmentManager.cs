@@ -59,7 +59,7 @@ public class EquipmentManager : MonoBehaviour
             rarityIntValue = Convert.ToInt32(rarity);
             for (int level = 1; level <= maxLevel; level++)
             {
-                string name = $"{rarity}_{level}";
+                string name = $"{rarity}_Weapon_{level}";
                 WeaponInfo weapon = weapons[weaponCount];
 
                 weapon.LoadEquipment(name);
@@ -111,7 +111,7 @@ public class EquipmentManager : MonoBehaviour
             {
                 WeaponInfo weapon = weapons[weaponCount];
 
-                string name = $"{rarity}_{level}";// Weapon Lv
+                string name = $"{rarity}_Weapon_{level}";// Weapon Lv
 
                 int equippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
                 int ownedEffect = (int)(equippedEffect * 0.5f);
@@ -217,7 +217,7 @@ public class EquipmentManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Weapon already exists in the dictionary: {equipmentName}");
+            Debug.LogWarning($"Equipment already exists in the dictionary: {equipmentName}");
         }
     }
 
@@ -230,7 +230,7 @@ public class EquipmentManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Weapon not found: {equipmentName}");
+            Debug.LogError($"Equipment not found: {equipmentName}");
             return null;
         }
     }
@@ -278,7 +278,7 @@ public class EquipmentManager : MonoBehaviour
             if (currentKey.StartsWith(rarity.ToString()))
             {
                 currentRarityIndex = Array.IndexOf(rarities, rarity);
-                if (type == EquipmentType.Weapon) int.TryParse(currentKey.Replace(rarity + "_", ""), out currentLevel);
+                if (type == EquipmentType.Weapon) int.TryParse(currentKey.Replace(rarity + "_Weapon_", ""), out currentLevel);
                 else if (type == EquipmentType.Armor) int.TryParse(currentKey.Replace(rarity + "_Armor_", ""), out currentLevel);
                 break;
             }
@@ -291,7 +291,7 @@ public class EquipmentManager : MonoBehaviour
                 // 같은 희귀도 내에서 다음 레벨 찾기
                 string nextKey =
                     (type == EquipmentType.Weapon)
-                    ? rarities[currentRarityIndex] + "_" + (currentLevel + 1)
+                    ? rarities[currentRarityIndex] + "_Weapon_" + (currentLevel + 1)
                     : rarities[currentRarityIndex] + "_Armor_" + (currentLevel + 1);
                 return allEquipment.TryGetValue(nextKey, out Equipment nextEquipment) ? nextEquipment : null;
             }
@@ -300,7 +300,7 @@ public class EquipmentManager : MonoBehaviour
                 // 희귀도를 증가시키고 첫 번째 레벨의 장비 찾기
                 string nextKey =
                     (type == EquipmentType.Weapon)
-                    ? rarities[currentRarityIndex + 1] + "_1"
+                    ? rarities[currentRarityIndex + 1] + "_Weapon_1"
                     : rarities[currentRarityIndex + 1] + "_Armor_1";
                 return allEquipment.TryGetValue(nextKey, out Equipment nextEquipment) ? nextEquipment : null;
             }
@@ -367,6 +367,72 @@ public class EquipmentManager : MonoBehaviour
                 recommendedArmor = armors[i];
         }
         return recommendedArmor;
+    }
+
+    public WeaponInfo GetRandomWeaponWithRarity(Rarity rarity)
+    {
+        List<WeaponInfo> weaponList = new List<WeaponInfo>(10);
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            if (weapons[i].rarity == rarity) weaponList.Add(weapons[i]);
+        }
+        int rndNum = Random.Range(0, weaponList.Count);
+        return weaponList[rndNum];
+    }
+
+    public ArmorInfo GetRandomArmorWithRarity(Rarity rarity)
+    {
+        List<ArmorInfo> armorList = new List<ArmorInfo>(10);
+        for (int i = 0; i < armors.Count; i++)
+        {
+            if (armors[i].rarity == rarity) armorList.Add(armors[i]);
+        }
+        int rndNum = Random.Range(0, armorList.Count);
+        return armorList[rndNum];
+    }
+
+    public void AddRandomSummonWeapon(SummonCountType count, SummonProbability prob)
+    {
+        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
+        for (int i = 0; i < weapons.Count; i++)
+            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
+
+        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
+        for (int i = 0; i < weapons.Count; i++)
+            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
+
+        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
+        for (int i = 0; i < weapons.Count; i++)
+            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
+
+        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
+        for (int i = 0; i < weapons.Count; i++)
+            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
+
+        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
+        for (int i = 0; i < weapons.Count; i++)
+            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
+
+
+        for (int i = 0; i < (int)count; i++)
+        {
+            int rndNum = Random.Range(0, 1000);
+            if (rndNum < prob.commonProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Common));
+            else if (rndNum < prob.uncommonProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Uncommon));
+            else if (rndNum < prob.rareProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Rare));
+            else if (rndNum < prob.epicProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Epic));
+            else if (rndNum < prob.ancientProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Ancient));
+            else if (rndNum < prob.legendaryProb)
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Legendary));
+            else
+                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Mythology));
+        }
+
     }
 
     public void TestGetRandomEquipment()

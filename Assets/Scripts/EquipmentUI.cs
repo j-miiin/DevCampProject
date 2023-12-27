@@ -104,8 +104,6 @@ public class EquipmentUI : MonoBehaviour
                 break;
         }
 
-        equipBtn.interactable = (equipment.quantity > 0);
-        enhanceBtn.interactable = (equipment.quantity > 0);
         compositeBtn.interactable = (equipment.quantity >= 4);
     }
     

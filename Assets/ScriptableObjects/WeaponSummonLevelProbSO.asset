@@ -14,72 +14,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   summonLevelProbList:
   - commonProb: 750
-    uncommonProb: 250
+    uncommonProb: 1000
     rareProb: 0
     epicProb: 0
     ancientProb: 0
     legendaryProb: 0
     mythologyProb: 0
   - commonProb: 500
-    uncommonProb: 375
-    rareProb: 135
+    uncommonProb: 875
+    rareProb: 1000
     epicProb: 0
     ancientProb: 0
     legendaryProb: 0
     mythologyProb: 0
   - commonProb: 250
-    uncommonProb: 375
-    rareProb: 350
-    epicProb: 25
+    uncommonProb: 625
+    rareProb: 975
+    epicProb: 1000
     ancientProb: 0
     legendaryProb: 0
     mythologyProb: 0
   - commonProb: 250
-    uncommonProb: 325
-    rareProb: 375
-    epicProb: 50
+    uncommonProb: 575
+    rareProb: 950
+    epicProb: 1000
     ancientProb: 0
     legendaryProb: 0
     mythologyProb: 0
   - commonProb: 0
     uncommonProb: 125
+    rareProb: 375
+    epicProb: 725
+    ancientProb: 975
+    legendaryProb: 1000
+    mythologyProb: 0
+  - commonProb: 0
+    uncommonProb: 100
     rareProb: 250
-    epicProb: 350
-    ancientProb: 250
-    legendaryProb: 25
+    epicProb: 600
+    ancientProb: 950
+    legendaryProb: 1000
     mythologyProb: 0
   - commonProb: 0
     uncommonProb: 100
-    rareProb: 150
-    epicProb: 350
-    ancientProb: 350
-    legendaryProb: 50
-    mythologyProb: 0
-  - commonProb: 0
-    uncommonProb: 100
-    rareProb: 100
-    epicProb: 350
-    ancientProb: 395
-    legendaryProb: 55
+    rareProb: 200
+    epicProb: 550
+    ancientProb: 945
+    legendaryProb: 1000
     mythologyProb: 0
   - commonProb: 0
     uncommonProb: 150
-    rareProb: 150
-    epicProb: 250
-    ancientProb: 385
-    legendaryProb: 65
+    rareProb: 300
+    epicProb: 550
+    ancientProb: 935
+    legendaryProb: 1000
     mythologyProb: 0
   - commonProb: 0
     uncommonProb: 0
     rareProb: 200
-    epicProb: 350
-    ancientProb: 375
-    legendaryProb: 70
-    mythologyProb: 5
+    epicProb: 550
+    ancientProb: 925
+    legendaryProb: 995
+    mythologyProb: 1000
   - commonProb: 0
     uncommonProb: 0
     rareProb: 180
-    epicProb: 350
-    ancientProb: 380
-    legendaryProb: 80
-    mythologyProb: 10
+    epicProb: 530
+    ancientProb: 910
+    legendaryProb: 990
+    mythologyProb: 1000

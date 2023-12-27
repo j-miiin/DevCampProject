@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
         CurrencyManager.instance.InitCurrencyManager();
         EquipmentManager.instance.InitEquipmentManager();
         StatusUpgradeManager.instance.InitStatusUpgradeManager();
-
+        SummonManager.instance.InitSummonManager();
 
         ES3.Save<bool>("Init_Game", true);
     }
