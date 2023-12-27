@@ -1,22 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class EquipmentManager : MonoBehaviour
+public class EquipmentManager : SerializedMonoBehaviour
 {
     public static EquipmentManager instance;
 
     [SerializeField] List<WeaponInfo> weapons = new List<WeaponInfo>();
     [SerializeField] List<ArmorInfo> armors = new List<ArmorInfo>();
 
-    [SerializeField]
-    private static Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
+    [SerializeField] readonly Dictionary<Rarity, WeaponInfo[]> weaponWithRarityDic;
+    [SerializeField] readonly Dictionary<Rarity, ArmorInfo[]> armorWithRarityDic;
+
+    [SerializeField] private static Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
 
     Rarity[] rarities = { Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Epic, Rarity.Ancient, Rarity.Legendary, Rarity.Mythology };
 
-    [SerializeField] Color[] colors;
+    [SerializeField] public Color[] colors;
 
     int maxLevel = 4;
 
@@ -165,12 +169,12 @@ public class EquipmentManager : MonoBehaviour
 
         equipment.quantity -= (compositeCount * 4);
         equipment.SetQuantityUI();
-        equipment.SaveEquipment(equipment.name);
+        equipment.SaveEquipmentAttribute(EquipmentAttribute.Quantity, equipment.name);
 
         Equipment nextEquipment = GetNextEquipment(equipment.name, equipment.type);
         nextEquipment.quantity += compositeCount;
         nextEquipment.SetQuantityUI();
-        nextEquipment.SaveEquipment(nextEquipment.name);
+        nextEquipment.SaveEquipmentAttribute(EquipmentAttribute.Quantity, nextEquipment.name);
 
         return compositeCount;
     }
@@ -369,70 +373,66 @@ public class EquipmentManager : MonoBehaviour
         return recommendedArmor;
     }
 
-    public WeaponInfo GetRandomWeaponWithRarity(Rarity rarity)
+    public List<Equipment> AddRandomSummonWeapon(SummonCountType countType, SummonProbability prob)
     {
-        List<WeaponInfo> weaponList = new List<WeaponInfo>(10);
-        for (int i = 0; i < weapons.Count; i++)
+        List<Equipment> resultWeaponList = new List<Equipment>(100);
+        HashSet<WeaponInfo> summonWeaponSet = new HashSet<WeaponInfo>();
+        for (int i = 0; i < (int)countType; i++)
         {
-            if (weapons[i].rarity == rarity) weaponList.Add(weapons[i]);
+            int rndNum = Random.Range(0, 1000);
+            WeaponInfo[] rarityWeapons = new WeaponInfo[10];
+            if (rndNum < prob.commonProb) rarityWeapons = weaponWithRarityDic[Rarity.Common];
+            else if (rndNum < prob.uncommonProb) rarityWeapons = weaponWithRarityDic[Rarity.Uncommon];
+            else if (rndNum < prob.rareProb) rarityWeapons = weaponWithRarityDic[Rarity.Rare];
+            else if (rndNum < prob.epicProb) rarityWeapons = weaponWithRarityDic[Rarity.Epic];
+            else if (rndNum < prob.ancientProb) rarityWeapons = weaponWithRarityDic[Rarity.Ancient];
+            else if (rndNum < prob.legendaryProb) rarityWeapons = weaponWithRarityDic[Rarity.Legendary];
+            else rarityWeapons = weaponWithRarityDic[Rarity.Mythology];
+
+            int rndIdx = Random.Range(0, rarityWeapons.Length);
+            rarityWeapons[rndIdx].quantity++;
+            resultWeaponList.Add(rarityWeapons[rndIdx]);
+            summonWeaponSet.Add(rarityWeapons[rndIdx]);
         }
-        int rndNum = Random.Range(0, weaponList.Count);
-        return weaponList[rndNum];
+
+        foreach (WeaponInfo weapon in summonWeaponSet)
+        {
+            weapon.SetQuantityUI();
+            weapon.SaveEquipmentAttribute(EquipmentAttribute.Quantity, weapon.name);
+        }
+
+        return resultWeaponList;
     }
 
-    public ArmorInfo GetRandomArmorWithRarity(Rarity rarity)
+    public List<Equipment> AddRandomSummonArmor(SummonCountType count, SummonProbability prob)
     {
-        List<ArmorInfo> armorList = new List<ArmorInfo>(10);
-        for (int i = 0; i < armors.Count; i++)
-        {
-            if (armors[i].rarity == rarity) armorList.Add(armors[i]);
-        }
-        int rndNum = Random.Range(0, armorList.Count);
-        return armorList[rndNum];
-    }
-
-    public void AddRandomSummonWeapon(SummonCountType count, SummonProbability prob)
-    {
-        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
-        for (int i = 0; i < weapons.Count; i++)
-            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
-
-        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
-        for (int i = 0; i < weapons.Count; i++)
-            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
-
-        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
-        for (int i = 0; i < weapons.Count; i++)
-            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
-
-        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
-        for (int i = 0; i < weapons.Count; i++)
-            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
-
-        List<WeaponInfo> commonWeapons = new List<WeaponInfo>();
-        for (int i = 0; i < weapons.Count; i++)
-            if (weapons[i].rarity == Rarity.Common) commonWeapons.Add(weapons[i]);
-
-
+        List<Equipment> resultArmorList = new List<Equipment>(100);
+        HashSet<ArmorInfo> summonArmorSet = new HashSet<ArmorInfo>();
         for (int i = 0; i < (int)count; i++)
         {
             int rndNum = Random.Range(0, 1000);
-            if (rndNum < prob.commonProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Common));
-            else if (rndNum < prob.uncommonProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Uncommon));
-            else if (rndNum < prob.rareProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Rare));
-            else if (rndNum < prob.epicProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Epic));
-            else if (rndNum < prob.ancientProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Ancient));
-            else if (rndNum < prob.legendaryProb)
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Legendary));
-            else
-                summonWeaponList.Add(EquipmentManager.instance.GetRandomWeaponWithRarity(Rarity.Mythology));
+            ArmorInfo[] rarityArmors = new ArmorInfo[10];
+            if (rndNum < prob.commonProb) rarityArmors = armorWithRarityDic[Rarity.Common];
+            else if (rndNum < prob.uncommonProb) rarityArmors = armorWithRarityDic[Rarity.Uncommon];
+            else if (rndNum < prob.rareProb) rarityArmors = armorWithRarityDic[Rarity.Rare];
+            else if (rndNum < prob.epicProb) rarityArmors = armorWithRarityDic[Rarity.Epic];
+            else if (rndNum < prob.ancientProb) rarityArmors = armorWithRarityDic[Rarity.Ancient];
+            else if (rndNum < prob.legendaryProb) rarityArmors = armorWithRarityDic[Rarity.Legendary];
+            else rarityArmors = armorWithRarityDic[Rarity.Mythology];
+
+            int rndIdx = Random.Range(0, rarityArmors.Length);
+            rarityArmors[rndIdx].quantity++;
+            resultArmorList.Add(rarityArmors[rndIdx]);
+            summonArmorSet.Add(rarityArmors[rndIdx]);
         }
 
+        foreach (ArmorInfo armor in summonArmorSet)
+        {
+            armor.SetQuantityUI();
+            armor.SaveEquipmentAttribute(EquipmentAttribute.Quantity, armor.name);
+        }
+
+        return resultArmorList;
     }
 
     public void TestGetRandomEquipment()

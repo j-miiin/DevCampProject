@@ -24,6 +24,21 @@ public enum Rarity
     // 기타 희귀도...
 }
 
+public enum EquipmentAttribute
+{
+    Name,
+    Quantity,
+    Level,
+    OnEquipped,
+    Type,
+    Rarity,
+    EnhancementLevel,
+    BasicEquippedEffect,
+    BasicOwnedEffect,
+    EquippedEffect,
+    OwnedEffect,
+}
+
 public class Equipment : MonoBehaviour
 {
     public string name;          // 장비의 이름
@@ -126,6 +141,46 @@ public class Equipment : MonoBehaviour
 
         ES3.Save<string>("equippedEffect_" + equipmentID, equippedEffect.ToString());
         ES3.Save<string>("ownedEffect_" + equipmentID, ownedEffect.ToString());
+    }
+
+    public void SaveEquipmentAttribute(EquipmentAttribute attr, string equipmentID)
+    {
+        switch (attr)
+        {
+            case EquipmentAttribute.Name:
+                ES3.Save<string>("name_" + equipmentID, name);
+                break;
+            case EquipmentAttribute.Quantity:
+                ES3.Save<int>("quantity_" + equipmentID, quantity);
+                break;
+            case EquipmentAttribute.Level:
+                ES3.Save<int>("level_" + equipmentID, level);
+                break;
+            case EquipmentAttribute.OnEquipped:
+                ES3.Save<bool>("onEquipped_" + equipmentID, OnEquipped);
+                break;
+            case EquipmentAttribute.Type:
+                ES3.Save<EquipmentType>("type_" + equipmentID, type);
+                break;
+            case EquipmentAttribute.Rarity:
+                ES3.Save<Rarity>("rarity_" + equipmentID, rarity);
+                break;
+            case EquipmentAttribute.EnhancementLevel:
+                ES3.Save<int>("enhancementLevel_" + equipmentID, enhancementLevel);
+                break;
+            case EquipmentAttribute.BasicEquippedEffect:
+                ES3.Save<int>("basicEquippedEffect_" + equipmentID, basicEquippedEffect);
+                break;
+            case EquipmentAttribute.BasicOwnedEffect:
+                ES3.Save<int>("basicOwnedEffect_" + equipmentID, basicOwnedEffect);
+                break;
+            case EquipmentAttribute.EquippedEffect:
+                ES3.Save<string>("equippedEffect_" + equipmentID, equippedEffect.ToString());
+                break;
+            case EquipmentAttribute.OwnedEffect:
+                ES3.Save<string>("ownedEffect_" + equipmentID, ownedEffect.ToString());
+                break;
+        }
     }
 
     // 장비 데이터를 ES3 파일에서 불러오기

@@ -1,10 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Keiwando.BigInteger;
-using TMPro;
-
 
 public class CurrencyManager : MonoBehaviour
 {
