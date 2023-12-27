@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Keiwando.BigInteger;
 using UnityEngine.UI;
 using UnityEngine;

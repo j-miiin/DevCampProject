@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
         EquipmentManager.instance.InitEquipmentManager();
         StatusUpgradeManager.instance.InitStatusUpgradeManager();
         SummonManager.instance.InitSummonManager();
+        AchievementManager.instance.InitAchievementManager();
 
         ES3.Save<bool>("Init_Game", true);
     }
