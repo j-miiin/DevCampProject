@@ -3,7 +3,6 @@ using System;
 using TMPro;
 using UnityEngine.UI;
 using Keiwando.BigInteger;
-using System.Collections.Generic;
 
 public class EquipmentUI : MonoBehaviour
 {
@@ -105,6 +104,8 @@ public class EquipmentUI : MonoBehaviour
                 break;
         }
 
+        equipBtn.interactable = (equipment.quantity > 0);
+        enhanceBtn.interactable = (equipment.quantity > 0);
         compositeBtn.interactable = (equipment.quantity >= 4);
     }
     
