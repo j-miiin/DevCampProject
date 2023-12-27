@@ -216,7 +216,7 @@ public class EquipmentUI : MonoBehaviour
     {
         EquipmentManager.instance.AllComposite(curTabType);
 
-        TriggerSelectEquipment(selectEquipment);
+        TriggerSelectEquipment(EquipmentManager.GetEquipment(selectEquipment.name));
         CheckAutoEquipActive();
         CheckAllComposite();
     }
