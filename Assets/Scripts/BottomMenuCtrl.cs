@@ -11,7 +11,7 @@ public class BottomMenuCtrl : SerializedMonoBehaviour
 
     // 업적 관련 알림 마크
     [SerializeField] private Dictionary<AchievementType, Button> buttonRelatedAchievementDic;
-    [SerializeField] private Dictionary<AchievementType, GameObject> achievementAlarmMarkDic;
+    [SerializeField] private Dictionary<AchievementType, GameObject> achievementGuideMarkDic;
 
     private void Start()
     {
@@ -23,7 +23,7 @@ public class BottomMenuCtrl : SerializedMonoBehaviour
         }
 
         InitAchievemenetAlarmMark();
-        AchievementManager.instance.OnTryAchievement += UpdateAchievementAlarmMark;
+        AchievementManager.instance.OnTryAchievement += UpdateAchievementGuideMark;
     }
 
     // 버튼 클릭 시 호출되는 메서드
@@ -40,13 +40,13 @@ public class BottomMenuCtrl : SerializedMonoBehaviour
     {
         foreach (KeyValuePair<AchievementType, Button> pair in buttonRelatedAchievementDic)
         {
-            pair.Value.onClick.AddListener(() => achievementAlarmMarkDic[pair.Key].SetActive(false));
+            pair.Value.onClick.AddListener(() => achievementGuideMarkDic[pair.Key].SetActive(false));
         }
     }
 
-    private void UpdateAchievementAlarmMark(AchievementType type)
+    private void UpdateAchievementGuideMark(AchievementType type)
     {
-        if (!achievementAlarmMarkDic.ContainsKey(type)) return;
-        achievementAlarmMarkDic[type].SetActive(true);
+        if (!achievementGuideMarkDic.ContainsKey(type)) return;
+        achievementGuideMarkDic[type].SetActive(true);
     }
 }

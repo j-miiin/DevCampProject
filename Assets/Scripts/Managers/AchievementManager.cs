@@ -13,6 +13,8 @@ public class AchievementManager : SerializedMonoBehaviour
     [SerializeField] private Dictionary<string, Achievement> achievementDic;
     [SerializeField] private Dictionary<AchievementType, List<Achievement>> achievementWithTypeDic;
 
+    [SerializeField] private GameObject achievementAlarmMark;
+
     private AchievementDataHandler dataHandler;
 
     private void Awake()
@@ -24,6 +26,11 @@ public class AchievementManager : SerializedMonoBehaviour
     {
         dataHandler = DataManager.instance.GetDataHandler<AchievementDataHandler>();
         achievementDic = dataHandler.LoadAchievementDictionary();
+        foreach (Achievement achievement in achievementDic.Values)
+        {
+            achievement.OnAchieve += () => { achievementAlarmMark.SetActive(true); };
+        }
+        UpdateAchievementAlarmMark();
     }
 
     public List<Achievement> GetAchievementList()
@@ -86,13 +93,26 @@ public class AchievementManager : SerializedMonoBehaviour
                 CurrencyManager.instance.AddCurrency("Dia", dataSO.RewardValue);
                 break;
             case RewardType.ATK_Stat:
-                Debug.Log($"보상 전 공격력 : {Player.instance.GetCurrentStatus(StatusType.ATK)}");
                 Player.instance.UpdateBaseStat(StatusType.ATK, dataSO.RewardValue);
-                Debug.Log($"보상 후 공격력 : {Player.instance.GetCurrentStatus(StatusType.ATK)}");
                 break;
         }
 
         SaveAchievementData();
+        UpdateAchievementAlarmMark();
+    }
+
+    public void UpdateAchievementAlarmMark()
+    {
+        foreach (Achievement achievement in achievementDic.Values)
+        {
+            if (!achievement.isCompleted
+                && achievement.curAchievementValue >= achievement.achievementDataSO.RequiredAchievementValue)
+            {
+                achievementAlarmMark.SetActive(true);
+                return;
+            }
+        }
+        achievementAlarmMark.SetActive(false);
     }
 
     public void TryAchieve(AchievementType type)

@@ -18,6 +18,8 @@ public enum RewardType
 [Serializable]
 public class Achievement
 {
+    public event Action OnAchieve;
+
     public AchievementDataSO achievementDataSO;
     public int curAchievementValue;
     public bool isCompleted;
@@ -32,8 +34,11 @@ public class Achievement
     public void UpdateAchievementValue(int value)
     {
         curAchievementValue += value;
-        if (curAchievementValue > achievementDataSO.RequiredAchievementValue)
+        if (curAchievementValue >= achievementDataSO.RequiredAchievementValue)
+        {
             curAchievementValue = achievementDataSO.RequiredAchievementValue;
+            OnAchieve?.Invoke();
+        }
     }
 
     public void CompleteAchievement()
