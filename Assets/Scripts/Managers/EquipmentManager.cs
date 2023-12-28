@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class EquipmentManager : SerializedMonoBehaviour
@@ -16,16 +14,16 @@ public class EquipmentManager : SerializedMonoBehaviour
     [SerializeField] readonly Dictionary<Rarity, WeaponInfo[]> weaponWithRarityDic;
     [SerializeField] readonly Dictionary<Rarity, ArmorInfo[]> armorWithRarityDic;
 
-    [SerializeField] private static Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
-
-    Rarity[] rarities = { Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Epic, Rarity.Ancient, Rarity.Legendary, Rarity.Mythology };
+    [SerializeField] private static Dictionary<string, Equipment> allEquipment;
 
     [SerializeField] public Color[] colors;
 
-    int maxLevel = 4;
+    Rarity[] rarities;
 
     private WeaponInfo recommendedWeapon;
     private ArmorInfo recommendedArmor;
+
+    private EquipmentDataHandler dataHandler;
 
     private void Awake()
     {
@@ -35,126 +33,27 @@ public class EquipmentManager : SerializedMonoBehaviour
     // 장비 매니저 초기화 메서드
     public void InitEquipmentManager()
     {
-        SetAllWeapons();
+        //SetAllWeapons();
+        dataHandler = DataManager.instance.GetDataHandler<EquipmentDataHandler>();
+        dataHandler.SetColorArray(colors);
+        rarities = dataHandler.LoadRarityDatas();
+        dataHandler.LoadAllEquipment(weapons, armors);
+        allEquipment = dataHandler.LoadAllEquipmentDic();
     }
 
-    // 장비들 업데이트 하는 메서드
-    void SetAllWeapons()
-    {
-        if (ES3.KeyExists("Init_Game"))
-        {
-            LoadAllWeapon();
-        }
-        else
-        {
-            CreateAllWeapon();
-        }
-    }
+    //// 장비들 업데이트 하는 메서드
+    //void SetAllWeapons()
+    //{
+    //    if (ES3.KeyExists("Init_Game"))
+    //    {
+    //        LoadAllEquipment();
+    //    }
+    //    else
+    //    {
+    //        CreateAllEquipment();
+    //    }
+    //}
 
-    // 로컬에 저장되어 있는 장비 데이터들 불러오는 메서드
-    public void LoadAllWeapon()
-    {
-        int weaponCount = 0;
-        int armorCount = 0;
-        int rarityIntValue = 0;
-
-        foreach (Rarity rarity in rarities)
-        {
-            rarityIntValue = Convert.ToInt32(rarity);
-            for (int level = 1; level <= maxLevel; level++)
-            {
-                string name = $"{rarity}_Weapon_{level}";
-                WeaponInfo weapon = weapons[weaponCount];
-
-                weapon.LoadEquipment(name);
-
-                weapon.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(weapon));
-
-                AddEquipment(name, weapon);
-
-                if (weapon.OnEquipped) Player.OnEquip(weapon);
-
-                weaponCount++;
-
-                // 임시
-                weapon.myColor = colors[rarityIntValue];
-                weapon.SetUI();
-
-                // Armor
-                string armorName = $"{rarity}_Armor_{level}";
-                ArmorInfo armor = armors[armorCount];
-
-                armor.LoadEquipment(armorName);
-
-                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
-
-                AddEquipment(armorName, armor);
-
-                if (armor.OnEquipped) Player.OnEquip(armor);
-
-                armorCount++;
-
-                armor.myColor = colors[rarityIntValue];
-                armor.SetUI();
-            }
-        }
-    }
-
-    // 장비 데이터를 만드는 메서드
-    void CreateAllWeapon()
-    {
-        int weaponCount = 0;
-        int armorCount = 0;
-        int rarityIntValue = 0;
-
-        foreach (Rarity rarity in rarities)
-        {
-            if (rarity == Rarity.None) continue;
-            rarityIntValue = Convert.ToInt32(rarity);
-            for (int level = 1; level <= maxLevel; level++)
-            {
-                WeaponInfo weapon = weapons[weaponCount];
-
-                string name = $"{rarity}_Weapon_{level}";// Weapon Lv
-
-                int equippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
-                int ownedEffect = (int)(equippedEffect * 0.5f);
-                string equippedEffectText = $"{equippedEffect}%";
-                string ownedEffectText = $"{ownedEffect}%"; 
-
-                weapon.SetWeaponInfo(name, 1, level, false, EquipmentType.Weapon, rarity,
-                                 1, equippedEffect, ownedEffect, colors[rarityIntValue]);
-
-                weapon.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(weapon));
-
-                AddEquipment(name, weapon);
-
-                weapon.SaveEquipment(name);
-
-                weaponCount++;
-
-                // Armor
-                ArmorInfo armor = armors[armorCount];
-                string armorName = $"{rarity}_Armor_{level}";// Weapon Lv
-
-                int armorEquippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
-                int armorOwnedEffect = (int)(armorEquippedEffect * 0.4f);
-                string armorEquippedEffectText = $"{armorEquippedEffect}%";
-                string armorOwnedEffectText = $"{armorOwnedEffect}%";
-
-                armor.SetArmorInfo(armorName, 1, level, false, EquipmentType.Armor, rarity,
-                                 1, armorEquippedEffect, armorOwnedEffect, colors[rarityIntValue]);
-
-                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
-
-                AddEquipment(armorName, armor);
-
-                armor.SaveEquipment(armorName);
-
-                armorCount++;
-            }
-        }
-    }
 
     // 매개변수로 받은 장비 합성하는 메서드
     public int Composite(Equipment equipment)
@@ -210,19 +109,6 @@ public class EquipmentManager : SerializedMonoBehaviour
                 return false;
         }
         return false;
-    }
-
-    // AllEquipment에 Equipment 더하는 메서드
-    public static void AddEquipment(string equipmentName, Equipment equipment)
-    {
-        if (!allEquipment.ContainsKey(equipmentName))
-        {
-            allEquipment.Add(equipmentName, equipment);
-        }
-        else
-        {
-            Debug.LogWarning($"Equipment already exists in the dictionary: {equipmentName}");
-        }
     }
 
     // AllEquipment에서 매개변수로 받은 string을 key로 사용해 Equipment 찾는 매서드
@@ -433,24 +319,5 @@ public class EquipmentManager : SerializedMonoBehaviour
         }
 
         return resultArmorList;
-    }
-
-    public void TestGetRandomEquipment()
-    {
-        for (int i = 0; i < weapons.Count; i++)
-        {
-            int rndNum = Random.Range(0, 4);
-            weapons[i].quantity += rndNum;
-            weapons[i].SetQuantityUI();
-            weapons[i].SaveEquipment(weapons[i].name);
-        }
-
-        for (int i = 0; i < armors.Count; i++)
-        {
-            int rndNum = Random.Range(0, 4);
-            armors[i].quantity += rndNum;
-            armors[i].SetQuantityUI();
-            armors[i].SaveEquipment(armors[i].name);
-        }
     }
 }
