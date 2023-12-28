@@ -9,7 +9,7 @@ public class AchievementPanelUI : MonoBehaviour
 
     private void OnEnable()
     {
-        AchievementManager.instance.SaveAchievementDictionary();
+        AchievementManager.instance.SaveAchievementData();
         SetAchievementList();
     }
 

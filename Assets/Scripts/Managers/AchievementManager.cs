@@ -13,6 +13,8 @@ public class AchievementManager : SerializedMonoBehaviour
     [SerializeField] private Dictionary<string, Achievement> achievementDic;
     [SerializeField] private Dictionary<AchievementType, List<Achievement>> achievementWithTypeDic;
 
+    private AchievementDataHandler dataHandler;
+
     private void Awake()
     {
         instance = this;
@@ -20,14 +22,8 @@ public class AchievementManager : SerializedMonoBehaviour
 
     public void InitAchievementManager()
     {
-        if (ES3.KeyExists("achievementDic"))
-        {
-            LoadAchievementDictionary();
-        }
-        else
-        {
-            CreateAchievementDictionary();
-        }
+        dataHandler = DataManager.instance.GetDataHandler<AchievementDataHandler>();
+        achievementDic = dataHandler.LoadAchievementDictionary();
     }
 
     public List<Achievement> GetAchievementList()
@@ -96,29 +92,12 @@ public class AchievementManager : SerializedMonoBehaviour
                 break;
         }
 
-        SaveAchievementDictionary();
+        SaveAchievementData();
     }
 
     public void TryAchieve(AchievementType type)
     {
         OnTryAchievement?.Invoke(type);
-    }
-
-    // 업적 정보 Dictionary 생성
-    public void CreateAchievementDictionary()
-    {
-        achievementDic = new Dictionary<string, Achievement>();
-        AchievementDataSO[] dataSOList = Resources.LoadAll<AchievementDataSO>("ScriptableObjects/Achievements");
-        for (int i = 0; i < dataSOList.Length; i++)
-        {
-#if UNITY_EDITOR
-            if (achievementDic.ContainsKey(dataSOList[i].ID))
-                Debug.LogError("Achievement already exist");
-#endif
-            achievementDic.Add(dataSOList[i].ID, new Achievement(dataSOList[i]));
-        }
-        LoadAchievementDataDictionary();
-        SaveAchievementDictionary();
     }
 
     // 타입 별 업적 Dictionary 생성
@@ -133,32 +112,8 @@ public class AchievementManager : SerializedMonoBehaviour
         }
     }
 
-    // 업적 정보 Dictionary 저장
-    public void SaveAchievementDictionary()
+    public void SaveAchievementData()
     {
-        ES3.Save<Dictionary<string, Achievement>>("achievementDic", achievementDic);
-
-    }
-
-    // 업적 데이터 SO 로드 및 Dictionary 생성
-    public void LoadAchievementDataDictionary()
-    {
-        AchievementDataSO[] dataSOList = Resources.LoadAll<AchievementDataSO>("ScriptableObjects/Achievements");
-        for (int i = 0; i < dataSOList.Length; i++)
-        {
-            string key = dataSOList[i].ID;
-            if (achievementDic.ContainsKey(key))
-                achievementDic[key].achievementDataSO = dataSOList[i];
-        }
-    }
-
-    // 업적 정보 Dictionary 로드
-    public bool LoadAchievementDictionary()
-    {
-        if (ES3.KeyExists("achievementDic"))
-            achievementDic = ES3.Load<Dictionary<string, Achievement>>("achievementDic");
-        else return false;
-        LoadAchievementDataDictionary();
-        return true;
+        dataHandler.SaveAchievementDictionary();
     }
 }

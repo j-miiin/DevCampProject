@@ -18,6 +18,8 @@ public class SummonManager : MonoBehaviour
     [SerializeField] private SummonLevelProbability[] summonLevelProbList;
     [SerializeField] private SummonResultPanelUI summonResultPanelUI;
 
+    private SummonDataHandler dataHandler;
+
     private void Awake()
     {
         instance = this;
@@ -25,7 +27,8 @@ public class SummonManager : MonoBehaviour
 
     public void InitSummonManager()
     {
-        if (!LoadSummonList()) CreateSummonList();
+        dataHandler = DataManager.instance.GetDataHandler<SummonDataHandler>();
+        summonList = dataHandler.LoadSummonList();
     }
 
     public Summon GetSummonInfo(SummonType type)
@@ -57,7 +60,7 @@ public class SummonManager : MonoBehaviour
         summonResultPanelUI.gameObject.SetActive(true);
 
         summonList[(int)SummonType.Weapon].GetExp((int)countType);
-        SaveSummonList();
+        dataHandler.SaveSummonList();
         CurrencyManager.instance.SubtractCurrency("Dia", (int)countType * 5);
         OnSummon?.Invoke(SummonType.Weapon);
 
@@ -75,36 +78,10 @@ public class SummonManager : MonoBehaviour
         summonResultPanelUI.gameObject.SetActive(true);
 
         summonList[(int)SummonType.Armor].GetExp((int)countType);
-        SaveSummonList();
+        dataHandler.SaveSummonList();
         CurrencyManager.instance.SubtractCurrency("Dia", (int)countType * 5);
         OnSummon?.Invoke(SummonType.Armor);
 
         AchievementManager.instance.UpdateAchievement(AchievementType.SummonEquipment, (int)countType);
-    }
-
-    public void CreateSummonList()
-    {
-        int typeCnt = System.Enum.GetValues(typeof(SummonType)).Length;
-        summonList = new Summon[typeCnt];
-        for (int i = 0; i < typeCnt; i++)
-        {
-            summonList[i] = new Summon(1, 200);
-        }
-        SaveSummonList();
-    }
-
-    // 소환 정보 리스트 저장
-    public void SaveSummonList()
-    {
-        ES3.Save<Summon[]>("summonList", summonList);
-    }
-
-    // 소환 정보 리스트 로드
-    public bool LoadSummonList()
-    {
-        if (ES3.KeyExists("summonList")) summonList = ES3.Load<Summon[]>("summonList");
-        else return false;
-
-        return true;
     }
 }

@@ -11,8 +11,9 @@ public class CurrencyManager : MonoBehaviour
     public event Action<string, string> OnCurrencyChanged;
 
     // 모든 통화의 목록 
-    public List<Currency> currencies = new List<Currency>();
+    public List<Currency> currencies;
 
+    private CurrencyDataHandler dataHandler;
 
     private void Awake()
     {
@@ -23,7 +24,14 @@ public class CurrencyManager : MonoBehaviour
     public void InitCurrencyManager()
     {
         OnCurrencyChanged += UpdateCurrencyUI;
-        LoadCurrencies();
+        dataHandler = DataManager.instance.GetDataHandler<CurrencyDataHandler>();
+        List<Currency> tmpList = dataHandler.LoadCurrencies();
+        if (tmpList != null) currencies = tmpList;
+        else dataHandler.SaveCurrencies(currencies);
+        foreach (Currency currency in currencies)
+        {
+            OnCurrencyChanged?.Invoke(currency.currencyName, currency.amount); // 로딩 후 이벤트 발생
+        }
     }
 
     // 특정 통화를 증가시키는 메서드
@@ -34,7 +42,7 @@ public class CurrencyManager : MonoBehaviour
         {
             currency.Add(value);
             OnCurrencyChanged?.Invoke(currencyName, currency.amount); // 이벤트 발생
-            SaveCurrencies();
+            dataHandler.SaveCurrencies();
         }
     }
 
@@ -47,7 +55,7 @@ public class CurrencyManager : MonoBehaviour
         {
             // 통화의 양을 감소시키, 결과에 따라 이벤트 발생
             bool result = currency.Subtract(value);
-            SaveCurrencies();
+            dataHandler.SaveCurrencies();
             if (result)
             {
                 OnCurrencyChanged?.Invoke(currencyName, currency.amount);
@@ -62,27 +70,6 @@ public class CurrencyManager : MonoBehaviour
     {
         Currency currency = currencies.Find(c => c.currencyName == currencyName);
         return currency?.amount ?? "0";
-    }
-
-    // 모든 통화를 로컬에 저장시키는 메서드
-    public void SaveCurrencies()
-    {
-        ES3.Save<List<Currency>>("currencies", currencies);
-    }
-
-    // 로컬에 저장되어있는 모든 통화를 불러오는 메서드
-    public bool LoadCurrencies()
-    {
-        if (ES3.KeyExists("currencies"))
-        {
-            currencies = ES3.Load<List<Currency>>("currencies");
-            foreach (Currency currency in currencies)
-            {
-                OnCurrencyChanged?.Invoke(currency.currencyName, currency.amount); // 로딩 후 이벤트 발생
-            }
-        }
-        else return false;
-        return true;
     }
 
     // 통화의 UI를 업데이트 시키는 메서드
