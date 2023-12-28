@@ -60,6 +60,8 @@ public class SummonManager : MonoBehaviour
         SaveSummonList();
         CurrencyManager.instance.SubtractCurrency("Dia", (int)countType * 5);
         OnSummon?.Invoke(SummonType.Weapon);
+
+        AchievementManager.instance.UpdateAchievement(AchievementType.SummonEquipment, (int)countType);
     }
 
     public void SummonArmor(SummonCountType countType)
@@ -76,6 +78,8 @@ public class SummonManager : MonoBehaviour
         SaveSummonList();
         CurrencyManager.instance.SubtractCurrency("Dia", (int)countType * 5);
         OnSummon?.Invoke(SummonType.Armor);
+
+        AchievementManager.instance.UpdateAchievement(AchievementType.SummonEquipment, (int)countType);
     }
 
     public void CreateSummonList()

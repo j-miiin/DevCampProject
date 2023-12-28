@@ -31,7 +31,12 @@ public class Achievement : MonoBehaviour
     public void UpdateAchievementValue(int value)
     {
         curAchievementValue += value;
-        if (curAchievementValue >= achievementDataSO.RequiredAchievementValue)
-            isCompleted = true;
+        if (curAchievementValue > achievementDataSO.RequiredAchievementValue)
+            curAchievementValue = achievementDataSO.RequiredAchievementValue;
+    }
+
+    public void CompleteAchievement()
+    {
+        isCompleted = true;
     }
 }
