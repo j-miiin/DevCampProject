@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AchievementPanelUI : MonoBehaviour
 {
     [SerializeField] private RectTransform container;
+    [SerializeField] private ScrollRect scrollRect;
 
     private void OnEnable()
     {
@@ -35,6 +37,7 @@ public class AchievementPanelUI : MonoBehaviour
             AchievementSlotUI slot = obj.GetComponent<AchievementSlotUI>();
             slot.SetSlotUI(achievementList[i]);
             slot.OnComplete += SetAchievementList;
+            slot.SetScrollRect(scrollRect);
         }
 
         for (int i = dataCnt; i < slotCnt; i++)

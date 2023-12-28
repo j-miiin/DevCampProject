@@ -1,10 +1,12 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class AchievementSlotUI : MonoBehaviour
+public class AchievementSlotUI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    #region Readonly Strings
     private readonly string ACHIEVEMENT_ENHANCE_EQUIPMENT = "장비 강화";
     private readonly string ACHIEVEMENT_SUMMON_EQUIPMENT = "장비 소환";
     private readonly string ACHIEVEMENT_UPGRADE_STAT = "스탯 업그레이드";
@@ -14,6 +16,7 @@ public class AchievementSlotUI : MonoBehaviour
 
     private readonly string GET_BUTTON_TEXT = "획득";
     private readonly string COMPLETE_BUTTON_TEXT = "완료";
+    #endregion
 
     public event Action OnComplete;
 
@@ -25,6 +28,7 @@ public class AchievementSlotUI : MonoBehaviour
     private TMP_Text getRewardButtonText;
 
     private string id;
+    private ScrollRect scrollRect;
 
     private void Awake()
     {
@@ -82,5 +86,34 @@ public class AchievementSlotUI : MonoBehaviour
     {
         AchievementManager.instance.CompleteAchievement(id);
         OnComplete?.Invoke();
+    }
+
+    public void SetScrollRect(ScrollRect sr)
+    {
+        scrollRect = sr;
+    }
+
+    // 슬롯 클릭 시 완료된 업적이 아닐 경우 관련된 곳에 알림 마크 활성화
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Achievement achievement = AchievementManager.instance.GetAchievement(id);
+        if (!achievement.isCompleted
+            && (achievement.curAchievementValue < achievement.achievementDataSO.RequiredAchievementValue))
+            AchievementManager.instance.TryAchieve(achievement.achievementDataSO.AchievementType);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        scrollRect.OnBeginDrag(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        scrollRect.OnDrag(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        scrollRect.OnEndDrag(eventData);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
@@ -6,6 +7,8 @@ using UnityEngine;
 public class AchievementManager : SerializedMonoBehaviour
 {
     public static AchievementManager instance;
+
+    public event Action<AchievementType> OnTryAchievement;
 
     [SerializeField] private Dictionary<string, Achievement> achievementDic;
     [SerializeField] private Dictionary<AchievementType, List<Achievement>> achievementWithTypeDic;
@@ -51,6 +54,7 @@ public class AchievementManager : SerializedMonoBehaviour
         return achievementDic[id];
     }
 
+    // 업적 업데이트 (업적 ID, 업데이트 수치)
     public void UpdateAchievement(string id, int achievementValue)
     {
         if (!achievementDic.ContainsKey(id)) return;
@@ -58,6 +62,7 @@ public class AchievementManager : SerializedMonoBehaviour
         achievementDic[id].UpdateAchievementValue(achievementValue);
     }
 
+    // 업적 업데이트 (업적 타입, 업데이트 수치)
     public void UpdateAchievement(AchievementType achievementType, int achievementValue)
     {
         if (achievementWithTypeDic == null) CreateAchievementWithTypeDictionary();
@@ -70,6 +75,7 @@ public class AchievementManager : SerializedMonoBehaviour
         }
     }
 
+    // 업적 달성
     public void CompleteAchievement(string id)
     {
         if (!achievementDic.ContainsKey(id)) return;
@@ -93,7 +99,12 @@ public class AchievementManager : SerializedMonoBehaviour
         SaveAchievementDictionary();
     }
 
-    // 업적 정보 리스트 생성
+    public void TryAchieve(AchievementType type)
+    {
+        OnTryAchievement?.Invoke(type);
+    }
+
+    // 업적 정보 Dictionary 생성
     public void CreateAchievementDictionary()
     {
         achievementDic = new Dictionary<string, Achievement>();
@@ -110,6 +121,7 @@ public class AchievementManager : SerializedMonoBehaviour
         SaveAchievementDictionary();
     }
 
+    // 타입 별 업적 Dictionary 생성
     public void CreateAchievementWithTypeDictionary()
     {
         achievementWithTypeDic = new Dictionary<AchievementType, List<Achievement>>();
@@ -121,13 +133,14 @@ public class AchievementManager : SerializedMonoBehaviour
         }
     }
 
-    // 업적 정보 리스트 저장
+    // 업적 정보 Dictionary 저장
     public void SaveAchievementDictionary()
     {
         ES3.Save<Dictionary<string, Achievement>>("achievementDic", achievementDic);
 
     }
 
+    // 업적 데이터 SO 로드 및 Dictionary 생성
     public void LoadAchievementDataDictionary()
     {
         AchievementDataSO[] dataSOList = Resources.LoadAll<AchievementDataSO>("ScriptableObjects/Achievements");
@@ -139,7 +152,7 @@ public class AchievementManager : SerializedMonoBehaviour
         }
     }
 
-    // 업적 정보 리스트 로드
+    // 업적 정보 Dictionary 로드
     public bool LoadAchievementDictionary()
     {
         if (ES3.KeyExists("achievementDic"))
