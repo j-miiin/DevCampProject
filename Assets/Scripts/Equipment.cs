@@ -80,6 +80,7 @@ public class Equipment : MonoBehaviour
 
         enhancementLevel++;
         // 강화효과 업데이트...
+        AchievementManager.instance.UpdateAchievement(AchievementType.EnhanceEquipment, 1);
     }
 
     // 강화할 때 필요한 강화석 return 시키는 메서드

@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AchievementData", menuName = "SO/AchievementData", order = 0)]
+[Serializable]
 public class AchievementDataSO : ScriptableObject
 {
     [SerializeField] private string id;

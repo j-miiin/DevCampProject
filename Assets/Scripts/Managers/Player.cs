@@ -23,11 +23,11 @@ public class Player : MonoBehaviour
     private int currentLevel;
 
     [SerializeField][Header("총 공격력")]
-    private BigInteger currentAttack = 0;
+    private BigInteger currentAttack;
     [SerializeField][Header("총 체력")]
-    private BigInteger currentHealth = 100;
+    private BigInteger currentHealth;
     [SerializeField][Header("총 방어력")]
-    private BigInteger currentDefense = 0;
+    private BigInteger currentDefense;
     [SerializeField][Header("총 크리티컬 확률")]
     private BigInteger currentCritChance;
     [SerializeField][Header("총 크리티컬 데미지")]
@@ -87,6 +87,11 @@ public class Player : MonoBehaviour
 
         Debug.Log($"레벨 업! 현재 레벨 : {currentLevel}\n현재 최대 경험치 : {maxExp}");
         Debug.Log($"현재 공격력 : {currentAttack}\n현재 체력 : {currentHealth}\n현재 방어력 : {currentDefense}");
+    }
+
+    public void UpdateBaseStat(StatusType statusType, int addValue)
+    {
+        status.IncreaseBaseStat(statusType, addValue);
     }
 
     // 현재 능력치를 불러오는 메서드

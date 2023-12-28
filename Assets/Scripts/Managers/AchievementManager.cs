@@ -17,8 +17,14 @@ public class AchievementManager : SerializedMonoBehaviour
 
     public void InitAchievementManager()
     {
-        if (!LoadAchievementList()) CreateAchievementDictionary();
-        CreateAchievementWithTypeDictionary();
+        if (ES3.KeyExists("achievementDic"))
+        {
+            LoadAchievementDictionary();
+        }
+        else
+        {
+            CreateAchievementDictionary();
+        }
     }
 
     public List<Achievement> GetAchievementList()
@@ -30,7 +36,8 @@ public class AchievementManager : SerializedMonoBehaviour
             else if (!a.isCompleted && b.isCompleted) return -1;
             else
             {
-                if (a.curAchievementValue >= b.curAchievementValue) return -1;
+                if (((float)a.curAchievementValue / a.achievementDataSO.RequiredAchievementValue)
+                >= ((float)b.curAchievementValue / b.achievementDataSO.RequiredAchievementValue)) return -1;
                 else return 1;
             }
         });
@@ -53,6 +60,8 @@ public class AchievementManager : SerializedMonoBehaviour
 
     public void UpdateAchievement(AchievementType achievementType, int achievementValue)
     {
+        if (achievementWithTypeDic == null) CreateAchievementWithTypeDictionary();
+
         if (!achievementWithTypeDic.ContainsKey(achievementType)) return;
 
         foreach (Achievement achievement in achievementWithTypeDic[achievementType])
@@ -68,6 +77,20 @@ public class AchievementManager : SerializedMonoBehaviour
         achievementDic[id].CompleteAchievement();
 
         // 보상 제공 로직
+        AchievementDataSO dataSO = achievementDic[id].achievementDataSO;
+        switch (dataSO.RewardType)
+        {
+            case RewardType.Dia:
+                CurrencyManager.instance.AddCurrency("Dia", dataSO.RewardValue);
+                break;
+            case RewardType.ATK_Stat:
+                Debug.Log($"보상 전 공격력 : {Player.instance.GetCurrentStatus(StatusType.ATK)}");
+                Player.instance.UpdateBaseStat(StatusType.ATK, dataSO.RewardValue);
+                Debug.Log($"보상 후 공격력 : {Player.instance.GetCurrentStatus(StatusType.ATK)}");
+                break;
+        }
+
+        SaveAchievementDictionary();
     }
 
     // 업적 정보 리스트 생성
@@ -83,6 +106,8 @@ public class AchievementManager : SerializedMonoBehaviour
 #endif
             achievementDic.Add(dataSOList[i].ID, new Achievement(dataSOList[i]));
         }
+        LoadAchievementDataDictionary();
+        SaveAchievementDictionary();
     }
 
     public void CreateAchievementWithTypeDictionary()
@@ -97,19 +122,30 @@ public class AchievementManager : SerializedMonoBehaviour
     }
 
     // 업적 정보 리스트 저장
-    public void SaveAchievementList()
+    public void SaveAchievementDictionary()
     {
         ES3.Save<Dictionary<string, Achievement>>("achievementDic", achievementDic);
 
     }
 
+    public void LoadAchievementDataDictionary()
+    {
+        AchievementDataSO[] dataSOList = Resources.LoadAll<AchievementDataSO>("ScriptableObjects/Achievements");
+        for (int i = 0; i < dataSOList.Length; i++)
+        {
+            string key = dataSOList[i].ID;
+            if (achievementDic.ContainsKey(key))
+                achievementDic[key].achievementDataSO = dataSOList[i];
+        }
+    }
+
     // 업적 정보 리스트 로드
-    public bool LoadAchievementList()
+    public bool LoadAchievementDictionary()
     {
         if (ES3.KeyExists("achievementDic"))
             achievementDic = ES3.Load<Dictionary<string, Achievement>>("achievementDic");
         else return false;
-
+        LoadAchievementDataDictionary();
         return true;
     }
 }

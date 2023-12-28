@@ -49,6 +49,7 @@ struct UpgradeData
 
         ES3.Save<int>($"{statusType}UpgradeLevel", upgradeLevel);
         OnStatusUpgrade?.Invoke(statusType,increase);
+        AchievementManager.instance.UpdateAchievement(AchievementType.UpgradeStat, 1);
     }
 
     // 크리티컬 스텟 업데이트하는 메서드 
@@ -60,6 +61,7 @@ struct UpgradeData
 
         ES3.Save<int>($"{statusType}UpgradeLevel", upgradeLevel);
         OnCritStatusUpgrade?.Invoke(statusType,critIncrease);
+        AchievementManager.instance.UpdateAchievement(AchievementType.UpgradeStat, 1);
     }
 
     // 스텟 로드할 때 부르는 메서드
@@ -364,10 +366,8 @@ public class StatusUpgradeManager : MonoBehaviour
         defenseUpgradeData.SetUpgradeUI();
         critChanceUpgradeData.SetUpgradeUI();
         critDamageUpgradeData.SetUpgradeUI();
+        atkSpeedUpgradeData.SetUpgradeUI();
     }
-
-
-
 
     // 버튼 눌렸을 때 동작하는 메서드
     public void UpgradeAttack()

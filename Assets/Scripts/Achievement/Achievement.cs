@@ -15,7 +15,8 @@ public enum RewardType
     ATK_Stat,
 }
 
-public class Achievement : MonoBehaviour
+[Serializable]
+public class Achievement
 {
     public AchievementDataSO achievementDataSO;
     public int curAchievementValue;
