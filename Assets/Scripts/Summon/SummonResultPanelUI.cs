@@ -27,6 +27,7 @@ public class SummonResultPanelUI : MonoBehaviour
         for (int i = 0; i < dataCnt; i++)
         {
             GameObject obj = container.GetChild(i).gameObject;
+            obj.SetActive(true);
             obj.GetComponent<SummonResultSlotUI>().SetSummonResultSlotUI(equipmentList[i]);
         }
 

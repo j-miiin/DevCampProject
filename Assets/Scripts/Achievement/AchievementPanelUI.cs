@@ -31,6 +31,7 @@ public class AchievementPanelUI : MonoBehaviour
         for (int i = 0; i < dataCnt; i++)
         {
             GameObject obj = container.GetChild(i).gameObject;
+            obj.SetActive(true);
             AchievementSlotUI slot = obj.GetComponent<AchievementSlotUI>();
             slot.SetSlotUI(achievementList[i]);
             slot.OnComplete += SetAchievementList;
