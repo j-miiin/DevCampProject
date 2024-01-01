@@ -12,7 +12,8 @@ public class ArmorInfo : Equipment
     [SerializeField] TMP_Text armorQuantityText;
     public Color myColor;
 
-    public ArmorInfo(string name, int quantity,int level, bool OnEquipped, EquipmentType type, Rarity rarity, int enhancementLevel, int basicEquippedEffect, int basicOwnedEffect) : base(name, quantity,level,OnEquipped, type, rarity, enhancementLevel, basicEquippedEffect, basicOwnedEffect)
+    public ArmorInfo(string name, int quantity,int level, bool OnEquipped, EquipmentType type, Rarity rarity, int enhancementLevel, int basicEquippedEffect, int basicOwnedEffect) 
+        : base(name, quantity,level,OnEquipped, type, rarity, enhancementLevel, basicEquippedEffect, basicOwnedEffect)
     {
         this.name = name;
         this.quantity = quantity;

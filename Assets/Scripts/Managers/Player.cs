@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     ArmorInfo equiped_Armor = null;
 
+    private EquipmentDataHandler equipmentDataHandler;
+
     private void Awake()
     {
         instance = this;
@@ -47,6 +49,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        equipmentDataHandler = DataManager.instance.GetDataHandler<EquipmentDataHandler>();
         SetupEventListeners();
         LoadLevelStatus();
     }
@@ -160,7 +163,8 @@ public class Player : MonoBehaviour
                 status.IncreaseBaseStatByPercent(StatusType.ATK, equiped_Weapon.equippedEffect);
 
                 EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
-                equiped_Weapon.SaveEquipment();
+                //equiped_Weapon.SaveEquipment();
+                equipmentDataHandler.SaveEquipment(equiped_Weapon);
                 Debug.Log("무기 장비 장착" + equiped_Weapon.name);
                 break;
             case EquipmentType.Armor:
@@ -174,7 +178,8 @@ public class Player : MonoBehaviour
                 status.IncreaseBaseStatByPercent(StatusType.HP, equiped_Armor.equippedEffect);
 
                 EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Armor.OnEquipped);
-                equiped_Armor.SaveEquipment();
+                //equiped_Armor.SaveEquipment();
+                equipmentDataHandler.SaveEquipment(equiped_Armor);
                 Debug.Log("방어구 장비 장착" + equiped_Armor.name);
                 break;
         }
@@ -191,7 +196,8 @@ public class Player : MonoBehaviour
                 equiped_Weapon.OnEquipped = false;
                 EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Weapon.OnEquipped);
                 status.DecreaseBaseStatByPercent(StatusType.ATK, equiped_Weapon.equippedEffect);
-                equiped_Weapon.SaveEquipment();
+                //equiped_Weapon.SaveEquipment();
+                equipmentDataHandler.SaveEquipment(equiped_Weapon);
                 Debug.Log("무기 장비 장착 해제" + equiped_Weapon.name);
                 equiped_Weapon = null;
                 break;
@@ -200,7 +206,8 @@ public class Player : MonoBehaviour
                 equiped_Armor.OnEquipped = false;
                 EquipmentUI.UpdateEquipmentUI?.Invoke(equiped_Armor.OnEquipped);
                 status.DecreaseBaseStatByPercent(StatusType.HP, equiped_Armor.equippedEffect);
-                equiped_Armor.SaveEquipment();
+                //equiped_Armor.SaveEquipment();
+                equipmentDataHandler.SaveEquipment(equiped_Armor);
                 Debug.Log("방어구 장비 장착 해제" + equiped_Armor.name);
                 equiped_Armor = null;
                 break;

@@ -1,148 +1,127 @@
-using System;
-using System.Collections.Generic;
+using Keiwando.BigInteger;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class EquipmentDataHandler : DataHandler
 {
-    private Rarity[] rarities = { Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Epic, Rarity.Ancient, Rarity.Legendary, Rarity.Mythology };
-
-    private Dictionary<string, Equipment> allEquipment = new Dictionary<string, Equipment>();
-
-    private Color[] colors;
-
-    private int maxLevel = 4;
-
-    public void SetColorArray(Color[] colorArray)
+    // ¿Â∫Ò µ•¿Ã≈Õ∏¶ ES3 ∆ƒ¿œø° ¿˙¿Â
+    public void SaveEquipment(Equipment equipment)
     {
-        colors = colorArray;
+        string name = equipment.name;
+
+        Debug.Log("¿Â∫Ò ¡§∫∏ ¿˙¿Â " + name);
+
+        ES3.Save<string>("name_" + name, name);
+        ES3.Save<int>("quantity_" + name, equipment.quantity);
+        ES3.Save<int>("level_" + name, equipment.level);
+        ES3.Save<bool>("onEquipped_" + name, equipment.OnEquipped);
+        ES3.Save<EquipmentType>("type_" + name, equipment.type);
+        ES3.Save<Rarity>("rarity_" + name, equipment.rarity);
+        ES3.Save<int>("enhancementLevel_" + name, equipment.enhancementLevel);
+        ES3.Save<int>("basicEquippedEffect_" + name, equipment.basicEquippedEffect);
+        ES3.Save<int>("basicOwnedEffect_" + name, equipment.basicOwnedEffect);
+
+        ES3.Save<string>("equippedEffect_" + name, equipment.equippedEffect.ToString());
+        ES3.Save<string>("ownedEffect_" + name, equipment.ownedEffect.ToString());
     }
 
-    public Rarity[] LoadRarityDatas()
+    public void SaveEquipment(Equipment equipment, string equipmentID)
     {
-        return rarities;
+        Debug.Log("¿Â∫Ò ¡§∫∏ ¿˙¿Â " + equipmentID);
+
+        ES3.Save<string>("name_" + equipmentID, equipment.name);
+        ES3.Save<int>("quantity_" + equipmentID, equipment.quantity);
+        ES3.Save<int>("level_" + equipmentID, equipment.level);
+        ES3.Save<bool>("onEquipped_" + equipmentID, equipment.OnEquipped);
+        ES3.Save<EquipmentType>("type_" + equipmentID, equipment.type);
+        ES3.Save<Rarity>("rarity_" + equipmentID, equipment.rarity);
+        ES3.Save<int>("enhancementLevel_" + equipmentID, equipment.enhancementLevel);
+        ES3.Save<int>("basicEquippedEffect_" + equipmentID, equipment.basicEquippedEffect);
+        ES3.Save<int>("basicOwnedEffect_" + equipmentID, equipment.basicOwnedEffect);
+
+        ES3.Save<string>("equippedEffect_" + equipmentID, equipment.equippedEffect.ToString());
+        ES3.Save<string>("ownedEffect_" + equipmentID, equipment.ownedEffect.ToString());
     }
 
-    // Î°úÏª¨Ïóê Ï†ÄÏû•ÎêòÏñ¥ ÏûàÎäî Ïû•ÎπÑ Îç∞Ïù¥ÌÑ∞Îì§ Î∂àÎü¨Ïò§Îäî Î©îÏÑúÎìú
-    public void LoadAllEquipment(List<WeaponInfo> weapons, List<ArmorInfo> armors)
+    public void SaveEquipmentAttribute(Equipment equipment, EquipmentAttribute attr, string equipmentID)
     {
-        int weaponCount = 0;
-        int armorCount = 0;
-        int rarityIntValue = 0;
-
-        foreach (Rarity rarity in rarities)
+        switch (attr)
         {
-            rarityIntValue = Convert.ToInt32(rarity);
-            for (int level = 1; level <= maxLevel; level++)
-            {
-                string name = $"{rarity}_Weapon_{level}";
-                WeaponInfo weapon = weapons[weaponCount];
-
-                weapon.LoadEquipment(name);
-
-                weapon.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(weapon));
-
-                AddEquipment(name, weapon);
-
-                if (weapon.OnEquipped) Player.OnEquip(weapon);
-
-                weaponCount++;
-
-                // ÏûÑÏãú
-                weapon.myColor = colors[rarityIntValue];
-                weapon.SetUI();
-
-                // Armor
-                string armorName = $"{rarity}_Armor_{level}";
-                ArmorInfo armor = armors[armorCount];
-
-                armor.LoadEquipment(armorName);
-
-                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
-
-                AddEquipment(armorName, armor);
-
-                if (armor.OnEquipped) Player.OnEquip(armor);
-
-                armorCount++;
-
-                armor.myColor = colors[rarityIntValue];
-                armor.SetUI();
-            }
+            case EquipmentAttribute.Name:
+                ES3.Save<string>("name_" + equipmentID, equipment.name);
+                break;
+            case EquipmentAttribute.Quantity:
+                ES3.Save<int>("quantity_" + equipmentID, equipment.quantity);
+                break;
+            case EquipmentAttribute.Level:
+                ES3.Save<int>("level_" + equipmentID, equipment.level);
+                break;
+            case EquipmentAttribute.OnEquipped:
+                ES3.Save<bool>("onEquipped_" + equipmentID, equipment.OnEquipped);
+                break;
+            case EquipmentAttribute.Type:
+                ES3.Save<EquipmentType>("type_" + equipmentID, equipment.type);
+                break;
+            case EquipmentAttribute.Rarity:
+                ES3.Save<Rarity>("rarity_" + equipmentID, equipment.rarity);
+                break;
+            case EquipmentAttribute.EnhancementLevel:
+                ES3.Save<int>("enhancementLevel_" + equipmentID, equipment.enhancementLevel);
+                break;
+            case EquipmentAttribute.BasicEquippedEffect:
+                ES3.Save<int>("basicEquippedEffect_" + equipmentID, equipment.basicEquippedEffect);
+                break;
+            case EquipmentAttribute.BasicOwnedEffect:
+                ES3.Save<int>("basicOwnedEffect_" + equipmentID, equipment.basicOwnedEffect);
+                break;
+            case EquipmentAttribute.EquippedEffect:
+                ES3.Save<string>("equippedEffect_" + equipmentID, equipment.equippedEffect.ToString());
+                break;
+            case EquipmentAttribute.OwnedEffect:
+                ES3.Save<string>("ownedEffect_" + equipmentID, equipment.ownedEffect.ToString());
+                break;
         }
     }
 
-    // Ïû•ÎπÑ Îç∞Ïù¥ÌÑ∞Î•º ÎßåÎìúÎäî Î©îÏÑúÎìú
-    public void CreateAllEquipment(List<WeaponInfo> weapons, List<ArmorInfo> armors)
+    // ¿Â∫Ò µ•¿Ã≈Õ∏¶ ES3 ∆ƒ¿œø°º≠ ∫“∑Øø¿±‚
+    public void LoadEquipment(Equipment equipment)
     {
-        int weaponCount = 0;
-        int armorCount = 0;
-        int rarityIntValue = 0;
+        string name = equipment.name;
 
-        foreach (Rarity rarity in rarities)
-        {
-            if (rarity == Rarity.None) continue;
-            rarityIntValue = Convert.ToInt32(rarity);
-            for (int level = 1; level <= maxLevel; level++)
-            {
-                WeaponInfo weapon = weapons[weaponCount];
+        if (!ES3.KeyExists("name_" + name)) return;
 
-                string name = $"{rarity}_Weapon_{level}";// Weapon Lv
+        Debug.Log("¿Â∫Ò ¡§∫∏ ∫“∑Øø¿±‚ " + name);
 
-                int equippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
-                int ownedEffect = (int)(equippedEffect * 0.5f);
-                string equippedEffectText = $"{equippedEffect}%";
-                string ownedEffectText = $"{ownedEffect}%";
+        equipment.name = ES3.Load<string>("name_" + name);
+        equipment.quantity = ES3.Load<int>("quantity_" + name);
+        equipment.level = ES3.Load<int>("level_" + name);
+        equipment.OnEquipped = ES3.Load<bool>("onEquipped_" + name);
+        equipment.type = ES3.Load<EquipmentType>("type_" + name);
+        equipment.rarity = ES3.Load<Rarity>("rarity_" + name);
+        equipment.enhancementLevel = ES3.Load<int>("enhancementLevel_" + name);
+        equipment.basicEquippedEffect = ES3.Load<int>("basicEquippedEffect_" + name);
+        equipment.basicOwnedEffect = ES3.Load<int>("basicOwnedEffect_" + name);
 
-                weapon.SetWeaponInfo(name, 1, level, false, EquipmentType.Weapon, rarity,
-                                 1, equippedEffect, ownedEffect, colors[rarityIntValue]);
-
-                weapon.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(weapon));
-
-                AddEquipment(name, weapon);
-
-                weapon.SaveEquipment(name);
-
-                weaponCount++;
-
-                // Armor
-                ArmorInfo armor = armors[armorCount];
-                string armorName = $"{rarity}_Armor_{level}";// Weapon Lv
-
-                int armorEquippedEffect = level * ((int)Mathf.Pow(10, rarityIntValue + 1));
-                int armorOwnedEffect = (int)(armorEquippedEffect * 0.4f);
-                string armorEquippedEffectText = $"{armorEquippedEffect}%";
-                string armorOwnedEffectText = $"{armorOwnedEffect}%";
-
-                armor.SetArmorInfo(armorName, 1, level, false, EquipmentType.Armor, rarity,
-                                 1, armorEquippedEffect, armorOwnedEffect, colors[rarityIntValue]);
-
-                armor.GetComponent<Button>().onClick.AddListener(() => EquipmentUI.TriggerSelectEquipment(armor));
-
-                AddEquipment(armorName, armor);
-
-                armor.SaveEquipment(armorName);
-
-                armorCount++;
-            }
-        }
+        equipment.equippedEffect = new BigInteger(ES3.Load<string>("equippedEffect_" + name));
+        equipment.ownedEffect = new BigInteger(ES3.Load<string>("ownedEffect_" + name));
     }
 
-    public Dictionary<string, Equipment> LoadAllEquipmentDic()
+    public void LoadEquipment(Equipment equipment, string equipmentID)
     {
-        return allEquipment;
-    }
+        if (!ES3.KeyExists("name_" + equipmentID)) return;
 
-    // AllEquipmentÏóê Equipment ÎçîÌïòÎäî Î©îÏÑúÎìú
-    public void AddEquipment(string equipmentName, Equipment equipment)
-    {
-        if (!allEquipment.ContainsKey(equipmentName))
-        {
-            allEquipment.Add(equipmentName, equipment);
-        }
-        else
-        {
-            Debug.LogWarning($"Equipment already exists in the dictionary: {equipmentName}");
-        }
+        Debug.Log("¿Â∫Ò ¡§∫∏ ∫“∑Øø¿±‚ " + equipmentID);
+
+        equipment.name = ES3.Load<string>("name_" + equipmentID);
+        equipment.quantity = ES3.Load<int>("quantity_" + equipmentID);
+        equipment.level = ES3.Load<int>("level_" + equipmentID);
+        equipment.OnEquipped = ES3.Load<bool>("onEquipped_" + equipmentID);
+        equipment.type = ES3.Load<EquipmentType>("type_" + equipmentID);
+        equipment.rarity = ES3.Load<Rarity>("rarity_" + equipmentID);
+        equipment.enhancementLevel = ES3.Load<int>("enhancementLevel_" + equipmentID);
+        equipment.basicEquippedEffect = ES3.Load<int>("basicEquippedEffect_" + equipmentID);
+        equipment.basicOwnedEffect = ES3.Load<int>("basicOwnedEffect_" + equipmentID);
+
+        equipment.equippedEffect = new BigInteger(ES3.Load<string>("equippedEffect_" + equipmentID));
+        equipment.ownedEffect = new BigInteger(ES3.Load<string>("ownedEffect_" + equipmentID));
     }
 }

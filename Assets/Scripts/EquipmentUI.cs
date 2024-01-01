@@ -272,7 +272,7 @@ public class EquipmentUI : MonoBehaviour
     // 선택한 장비 데이터 업데이트 (저장한다고 생각하면 편함)
     public void UpdateSelectEquipmentData()
     {
-        EquipmentManager.SetEquipment(selectEquipment.name, selectEquipment);
+        EquipmentManager.instance.SetEquipment(selectEquipment.name, selectEquipment);
     }
 
     public void CheckAutoEquipActive()
