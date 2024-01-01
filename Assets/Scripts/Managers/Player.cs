@@ -14,13 +14,13 @@ public class Player : MonoBehaviour
     PlayerStatus status;
 
     [SerializeField][Header("경험치 증가 계수")]
-    private int exp;
+    private int expNum;
     [SerializeField][Header("현재 경험치")]
-    private int currentExp;
+    private int curExp;
     [SerializeField][Header("현재 최대 경험치")]
     private int maxExp;
     [SerializeField][Header("현재 레벨")]
-    private int currentLevel;
+    private int level;
 
     [SerializeField][Header("총 공격력")]
     private BigInteger currentAttack;
@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     ArmorInfo equiped_Armor = null;
 
+    private PlayerDataHandler playerDataHandler;
     private EquipmentDataHandler equipmentDataHandler;
 
     private void Awake()
@@ -49,9 +50,10 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        playerDataHandler = DataManager.instance.GetDataHandler<PlayerDataHandler>();
         equipmentDataHandler = DataManager.instance.GetDataHandler<EquipmentDataHandler>();
         SetupEventListeners();
-        LoadLevelStatus();
+        SetPlayerLevelData();
     }
 
     // 이벤트 설정하는 메서드
@@ -68,27 +70,35 @@ public class Player : MonoBehaviour
         OnUnEquip += UnEquip;
     }
 
+    private void SetPlayerLevelData()
+    {
+        PlayerLevelData data = playerDataHandler.LoadLevelStatus();
+        level = data.level;
+        curExp = data.curExp;
+        maxExp = data.maxExp;
+    }
+
     public void GetExp()
     {
-        currentExp += exp;
-        if (currentExp >= maxExp) LevelUp();
+        curExp += expNum;
+        if (curExp >= maxExp) LevelUp();
 
-        SaveLevelStatus();
+        playerDataHandler.SaveLevelStatus(new PlayerLevelData(level, curExp, maxExp));
     }
 
     public void LevelUp()
     {
-        currentLevel++;
+        level++;
         maxExp += maxExp / 5;
-        currentExp = 0;
+        curExp = 0;
 
         status.IncreaseBaseStat(StatusType.ATK, 2);
         status.IncreaseBaseStat(StatusType.HP, 50);
         status.IncreaseBaseStat(StatusType.DEF, 2);
 
-        SaveLevelStatus();
+        playerDataHandler.SaveLevelStatus(new PlayerLevelData(level, curExp, maxExp));
 
-        Debug.Log($"레벨 업! 현재 레벨 : {currentLevel}\n현재 최대 경험치 : {maxExp}");
+        Debug.Log($"레벨 업! 현재 레벨 : {level}\n현재 최대 경험치 : {maxExp}");
         Debug.Log($"현재 공격력 : {currentAttack}\n현재 체력 : {currentHealth}\n현재 방어력 : {currentDefense}");
     }
 
@@ -222,28 +232,5 @@ public class Player : MonoBehaviour
     public ArmorInfo GetCurrentEquipedArmor()
     {
         return equiped_Armor;
-    }
-
-    // 플레이어 레벨 및 경험치 저장
-    public void SaveLevelStatus()
-    {
-        ES3.Save<int>("level", currentLevel);
-        ES3.Save<int>("exp", currentExp);
-        ES3.Save<int>("maxExp", maxExp);
-    }
-
-    // 플레이어 레벨 및 경험치 정보 로드
-    public bool LoadLevelStatus()
-    {
-        if (ES3.KeyExists("level")) currentLevel = ES3.Load<int>("level");
-        else return false;
-
-        if (ES3.KeyExists("exp")) currentExp = ES3.Load<int>("exp");
-        else return false;
-
-        if (ES3.KeyExists("maxExp")) maxExp = ES3.Load<int>("maxExp");
-        else return false;
-
-        return true;
     }
 }
