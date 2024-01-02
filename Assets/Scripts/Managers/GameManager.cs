@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -17,4 +15,8 @@ public class GameManager : MonoBehaviour
         ES3.Save<bool>("Init_Game", true);
     }
 
+    private void OnApplicationQuit()
+    {
+        AchievementManager.instance.SaveAchievementData();
+    }
 }
