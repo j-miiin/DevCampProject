@@ -14,7 +14,7 @@ public struct PlayerLevelData
 
 public class PlayerDataHandler : DataHandler
 {
-    // ÇÃ·¹ÀÌ¾î ·¹º§ ¹× °æÇèÄ¡ ÀúÀå
+    // í”Œë ˆì´ì–´ ë ˆë²¨ ê´€ë ¨ ì •ë³´ ì €ì¥ 
     public void SaveLevelStatus(PlayerLevelData data)
     {
         ES3.Save<int>("level", data.level);
@@ -22,7 +22,7 @@ public class PlayerDataHandler : DataHandler
         ES3.Save<int>("maxExp", data.maxExp);
     }
 
-    // ÇÃ·¹ÀÌ¾î ·¹º§ ¹× °æÇèÄ¡ Á¤º¸ ·Îµå
+    // í”Œë ˆì´ì–´ ë ˆë²¨ ê´€ë ¨ ì •ë³´ ë¡œë“œ
     public PlayerLevelData LoadLevelStatus()
     {
         PlayerLevelData data = new PlayerLevelData();

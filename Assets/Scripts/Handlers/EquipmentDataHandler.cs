@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class EquipmentDataHandler : DataHandler
 {
-    // Àåºñ µ¥ÀÌÅÍ¸¦ ES3 ÆÄÀÏ¿¡ ÀúÀå
+    // ìž¥ë¹„ ì •ë³´ ì €ìž¥
     public void SaveEquipment(Equipment equipment)
     {
         string name = equipment.name;
 
-        Debug.Log("Àåºñ Á¤º¸ ÀúÀå " + name);
+        Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ " + name);
 
         ES3.Save<string>("name_" + name, name);
         ES3.Save<int>("quantity_" + name, equipment.quantity);
@@ -26,7 +26,7 @@ public class EquipmentDataHandler : DataHandler
 
     public void SaveEquipment(Equipment equipment, string equipmentID)
     {
-        Debug.Log("Àåºñ Á¤º¸ ÀúÀå " + equipmentID);
+        Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ " + equipmentID);
 
         ES3.Save<string>("name_" + equipmentID, equipment.name);
         ES3.Save<int>("quantity_" + equipmentID, equipment.quantity);
@@ -82,14 +82,14 @@ public class EquipmentDataHandler : DataHandler
         }
     }
 
-    // Àåºñ µ¥ÀÌÅÍ¸¦ ES3 ÆÄÀÏ¿¡¼­ ºÒ·¯¿À±â
+    // ìž¥ë¹„ ì •ë³´ ë¡œë“œ
     public void LoadEquipment(Equipment equipment)
     {
         string name = equipment.name;
 
         if (!ES3.KeyExists("name_" + name)) return;
 
-        Debug.Log("Àåºñ Á¤º¸ ºÒ·¯¿À±â " + name);
+        Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ " + name);
 
         equipment.name = ES3.Load<string>("name_" + name);
         equipment.quantity = ES3.Load<int>("quantity_" + name);
@@ -109,7 +109,7 @@ public class EquipmentDataHandler : DataHandler
     {
         if (!ES3.KeyExists("name_" + equipmentID)) return;
 
-        Debug.Log("Àåºñ Á¤º¸ ºÒ·¯¿À±â " + equipmentID);
+        Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ " + equipmentID);
 
         equipment.name = ES3.Load<string>("name_" + equipmentID);
         equipment.quantity = ES3.Load<int>("quantity_" + equipmentID);
